@@ -1,35 +1,28 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import { create } from "zustand";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
-import { PlayingContext } from "./PlayingContext";
 import PaletteService from "../services/palette.service";
 
 const API_BASE_URL = "http://localhost:8080";
 
-export const TimeLayersContext = createContext();
+export const useTimeLayersState = create((set, get) => ({
+  domains: [],
+  layers: [],
+  variable: "salinity",
+  //   radiusPixels: 5,
 
-export const TimeLayersProvider = ({ children }) => {
-  const [domains, setDomains] = useState([]);
-  const [layers, setLayers] = useState([]);
-  const [variable, setVariable] = useState("salinity");
-  const radiusPixels = useRef(2);
+  setDomains: (domains) => set({ domains }),
+  setVariable: (variable) => set({ variable }),
+  setLayers: (layers) => set({ layers }),
 
-  const { initPlayer, timeIndex, timeInterval, playing } =
-    useContext(PlayingContext);
+  // Sacar a un servicio especifio de calculos varios
+  getRadiusPixel: () => {
+    return 5;
+  },
 
-  const addDomain = async (domain) => {
-    let newDomains = [...domains, domain];
-    setDomains(newDomains);
-    initPlayer(newDomains);
-  };
-
-  const getRadiusPixel = () => {
-    // TODO
-  };
-
-  const getLayersForTime = async (timeIndex) => {
-    console.log(timeInterval.current[timeIndex]);
+  getLayersForTime: async (date) => {
+    console.log(date);
     const newLayers = [];
-    for (let domain of domains) {
+    for (let domain of get().domains) {
       try {
         const response = await fetch(`${API_BASE_URL}/api/heatmap/data`, {
           method: "POST",
@@ -39,10 +32,10 @@ export const TimeLayersProvider = ({ children }) => {
           body: JSON.stringify({
             sourceId: domain.sourceId,
             domainId: domain.id,
-            date: timeInterval.current[timeIndex],
+            date,
             minValue: 26.45,
             maxValue: 37.43,
-            variables: [variable],
+            variables: [get().variable],
             bounds: {
               viewS: null,
               viewW: null,
@@ -59,7 +52,7 @@ export const TimeLayersProvider = ({ children }) => {
           getPosition: (d) => [d[0], d[1]],
           getWeight: (d) => d[2],
           aggregation: "MEAN",
-          radiusPixels,
+          radiusPixels: get().getRadiusPixel(),
           intensity: 1,
           threshold: 0.03,
           colorRange: PaletteService.getColorsDistribution(
@@ -73,14 +66,7 @@ export const TimeLayersProvider = ({ children }) => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-
-      setLayers(newLayers);
     }
-  };
-
-  return (
-    <TimeLayersContext.Provider value={{ addDomain, layers, getLayersForTime }}>
-      {children}
-    </TimeLayersContext.Provider>
-  );
-};
+    set({ layers: newLayers });
+  },
+}));

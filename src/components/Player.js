@@ -1,14 +1,24 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import "../styles/player.css";
-import { PlayingContext } from "../providers/PlayingContext";
-import { TimeLayersContext } from "../providers/TimeLayersContext";
+import { useTimeLayersState } from "../states/TimeLayersState";
+import { usePlayingState } from "../states/PlayingState";
 
 export const Player = () => {
-  const { timeIndex, setTimeIndex, playing } = useContext(PlayingContext);
-  const { getLayersForTime } = useContext(TimeLayersContext);
+  const { timeIndex, setTimeIndex, playing, timeInterval } = usePlayingState(
+    (state) => ({
+      timeIndex: state.timeIndex,
+      setTimeIndex: state.timeIndex,
+      playing: state.playing,
+      timeInterval: state.timeInterval,
+    })
+  );
+
+  const { getLayersForTime } = useTimeLayersState((state) => ({
+    getLayersForTime: state.getLayersForTime,
+  }));
 
   useEffect(() => {
-    if (playing) getLayersForTime(timeIndex);
+    if (playing) getLayersForTime(timeInterval[timeIndex]);
   }, [timeIndex]);
 
   return (

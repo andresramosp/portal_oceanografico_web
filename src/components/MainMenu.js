@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import "../styles/mainMenu.css";
-import { StaticLayersContext } from "../providers/StaticLayersContext";
-import { TimeLayersContext } from "../providers/TimeLayersContext";
+import { useTimeLayersState } from "../states/TimeLayersState";
+import { usePlayingState } from "../states/PlayingState";
 
 const MainMenu = ({ menuData }) => {
   return (
@@ -33,8 +33,12 @@ const Accordion = ({ section }) => {
 };
 
 const Option = ({ option }) => {
-  const { addDomain } = useContext(TimeLayersContext);
-  const { addLayer } = useContext(StaticLayersContext);
+  const { setDomains } = useTimeLayersState((state) => ({
+    setDomains: state.setDomains,
+  }));
+  const { initPlayer } = usePlayingState((state) => ({
+    initPlayer: state.initPlayer,
+  }));
 
   const API_BASE_URL = "http://localhost:8080";
 
@@ -43,10 +47,9 @@ const Option = ({ option }) => {
       const response = await fetch(
         `${API_BASE_URL}/api/heatmap/domains?variable=${option.variable}&sourceId=${option.sourceId}`
       );
-      const data = await response.json();
-      for (let domain of data) {
-        addDomain(domain);
-      }
+      const domains = await response.json();
+      setDomains(domains);
+      initPlayer(domains);
     }
   };
 
