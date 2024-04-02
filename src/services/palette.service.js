@@ -301,6 +301,34 @@ const PaletteService = {
     }
     return result;
   },
+
+  getColorDomain(paletteDistribution, histogramThreshold, minThresholdVar) {
+    let minThreshold = 0;
+    let maxThreshold = 100;
+    if (paletteDistribution.length > 1) {
+      let minAcc = 0;
+      let i = 0;
+      do {
+        if (minAcc + paletteDistribution[i] < histogramThreshold) {
+          minAcc += paletteDistribution[i];
+          minThreshold += 100 / paletteDistribution.length;
+        } else {
+          let partialSegment = histogramThreshold - minAcc;
+          minAcc += partialSegment;
+          let percentSegment = (partialSegment * 100) / paletteDistribution[i];
+          minThreshold += percentSegment / paletteDistribution.length;
+        }
+
+        i++;
+      } while (minAcc < histogramThreshold);
+
+      if (minThreshold < minThresholdVar) minThreshold = minThresholdVar;
+    } else {
+      minThreshold = minThresholdVar;
+    }
+    console.log("Color domain: ", minThreshold, maxThreshold);
+    return [minThreshold, maxThreshold];
+  },
 };
 
 export default PaletteService;

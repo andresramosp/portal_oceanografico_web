@@ -36,9 +36,6 @@ const Option = ({ option }) => {
   const { setDomains } = useTimeLayersState((state) => ({
     setDomains: state.setDomains,
   }));
-  const { initPlayer } = usePlayingState((state) => ({
-    initPlayer: state.initPlayer,
-  }));
 
   const API_BASE_URL = "http://localhost:8080";
 
@@ -49,7 +46,6 @@ const Option = ({ option }) => {
       );
       const domains = await response.json();
       setDomains(domains);
-      initPlayer(domains);
     }
   };
 

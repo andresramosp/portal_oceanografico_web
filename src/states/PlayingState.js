@@ -1,11 +1,15 @@
 import { create } from "zustand";
 
+const API_BASE_URL = "http://localhost:8080";
+
 export const usePlayingState = create((set, get) => ({
   timeIndex: 0,
-  dateFrom: new Date("2024-03-21T00:00:00.000Z"),
-  dateTo: new Date("2024-03-21T23:00:00.000Z"),
+  minDateFrom: null,
+  maxDateFrom: null,
+  dateFrom: null,
+  dateTo: null,
   playing: false,
-  delay: 200,
+  delay: 2000,
   timeInterval: [],
   hourGap: 1,
   animationFrameId: null,
@@ -18,6 +22,9 @@ export const usePlayingState = create((set, get) => ({
     cancelAnimationFrame(get().animationFrameId);
     set({ playing: false });
   },
+  setMinDateFrom: (minDateFrom) => set({ minDateFrom }),
+  setMaxDateFrom: (maxDateFrom) => set({ maxDateFrom }),
+  setDateTo: (dateTo) => set({ dateTo }),
   setDateFrom: (dateFrom) => set({ dateFrom }),
   setDateTo: (dateTo) => set({ dateTo }),
   setHourGap: (hourGap) =>
@@ -25,11 +32,30 @@ export const usePlayingState = create((set, get) => ({
       state.hourGap = hourGap;
     }),
 
-  initPlayer: (domains) => {
-    // TODO: llamada getRange para dominios (como la antigua para multiples dominios)
-    // TODO setDateTo, setDateFrom
+  setPlayerInterval: async (domains) => {
+    const response = await fetch(`${API_BASE_URL}/api/heatmap/daterange`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sourceId: domains[0].sourceId,
+        domainId: domains[0].id,
+      }),
+    });
+    // Sacamos fecha max y min del conjunto de domimios (para los selects)
+    const { minDate, maxDate } = await response.json();
+    get().setMinDateFrom(minDate);
+    get().setMaxDateFrom(maxDate);
+    // TODO: Establecemos reproduccion de ultima semana de ese rango
+    get().setDateFrom(minDate);
+    get().setDateTo(maxDate);
+
     set({ timeIndex: 0 });
-    get().getTimeIntervalArray(); // con dateFrom dateTo
+    get().getTimeIntervalArray();
+  },
+
+  initPlayer: () => {
     set({ playing: true });
     get().play();
   },
@@ -60,7 +86,6 @@ export const usePlayingState = create((set, get) => ({
     let currentDate = new Date(get().dateFrom);
     currentDate.setUTCHours(0, 0, 0, 0);
     let stopDate = new Date(get().dateTo);
-
     while (currentDate < stopDate) {
       result.push(new Date(currentDate)); // Crear una nueva instancia de Date
       currentDate.setHours(currentDate.getHours() + get().hourGap);

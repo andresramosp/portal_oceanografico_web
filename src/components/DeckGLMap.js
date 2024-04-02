@@ -2,27 +2,33 @@ import { Map } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
 import { useTimeLayersState } from "../states/TimeLayersState";
+import useMapState from "../states/MapState";
 
-const INITIAL_VIEW_STATE = {
-  longitude: -3.7036,
-  latitude: 40.4167,
-  zoom: 4,
-  maxZoom: 16,
-  pitch: 0,
-  bearing: 0,
-};
+export default function DeckGLMap() {
+  const { viewState, mapStyle, setViewState } = useMapState((state) => ({
+    viewState: state.viewState,
+    mapStyle: state.mapStyle,
+    setViewState: state.setViewState,
+  }));
 
-const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json";
-
-export default function DeckGLMap({ mapStyle = MAP_STYLE }) {
-  const { layers } = useTimeLayersState((state) => ({
+  const { layers: timeLayers } = useTimeLayersState((state) => ({
     layers: state.layers,
   }));
 
+  // const { layers: featureLayers } = useFeatureLayersState((state) => ({
+  //   layers: state.layers,
+  // }));
+
+  const onViewStateChange = ({ viewState }) => {
+    setViewState(viewState);
+  };
+
+  const layers = [...timeLayers];
+
   return (
     <DeckGL
-      initialViewState={INITIAL_VIEW_STATE}
+      initialViewState={viewState}
+      onViewStateChange={onViewStateChange}
       controller={true}
       layers={layers}
     >
