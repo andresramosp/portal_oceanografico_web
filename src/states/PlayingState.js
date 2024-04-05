@@ -1,6 +1,5 @@
 import { create } from "zustand";
-
-const API_BASE_URL = "http://localhost:8080";
+import { getDateRange } from "../services/api/heatmap.service";
 
 export const usePlayingState = create((set, get) => ({
   timeIndex: 0,
@@ -17,34 +16,18 @@ export const usePlayingState = create((set, get) => ({
 
   setTimeIndex: (timeIndex) => set({ timeIndex }),
   setPlaying: (playing) => set({ playing }),
-  stop: () => {
-    clearTimeout(get().animationFrameSetTimeoutId);
-    cancelAnimationFrame(get().animationFrameId);
-    set({ playing: false });
-  },
   setMinDateFrom: (minDateFrom) => set({ minDateFrom }),
   setMaxDateFrom: (maxDateFrom) => set({ maxDateFrom }),
   setDateTo: (dateTo) => set({ dateTo }),
   setDateFrom: (dateFrom) => set({ dateFrom }),
-  setDateTo: (dateTo) => set({ dateTo }),
   setHourGap: (hourGap) =>
     set((state) => {
       state.hourGap = hourGap;
     }),
 
   setPlayerInterval: async (domains) => {
-    const response = await fetch(`${API_BASE_URL}/api/heatmap/daterange`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sourceId: domains[0].sourceId,
-        domainId: domains[0].id,
-      }),
-    });
     // Sacamos fecha max y min del conjunto de domimios (para los selects)
-    const { minDate, maxDate } = await response.json();
+    const { minDate, maxDate } = await getDateRange(domains);
     get().setMinDateFrom(minDate);
     get().setMaxDateFrom(maxDate);
     // TODO: Establecemos reproduccion de ultima semana de ese rango
@@ -60,14 +43,26 @@ export const usePlayingState = create((set, get) => ({
     get().play();
   },
 
-  play: () => {
+  togglePlaying: () => {
+    set({ playing: !get().playing });
     if (get().playing) {
-      const timeoutId = setTimeout(() => {
-        const frameId = requestAnimationFrame(get().forward);
-        set({ animationFrameId: frameId });
-      }, get().delay);
-      set({ animationFrameSetTimeoutId: timeoutId });
+      get().play();
+    } else {
+      get().stop();
     }
+  },
+
+  play: () => {
+    const timeoutId = setTimeout(() => {
+      const frameId = requestAnimationFrame(get().forward);
+      set({ animationFrameId: frameId });
+    }, get().delay);
+    set({ animationFrameSetTimeoutId: timeoutId });
+  },
+
+  stop: () => {
+    clearTimeout(get().animationFrameSetTimeoutId);
+    cancelAnimationFrame(get().animationFrameId);
   },
 
   forward: () => {

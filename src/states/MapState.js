@@ -3,8 +3,8 @@ import { create } from "zustand";
 const useMapState = create((set) => ({
   viewState: {
     longitude: -3.7036,
-    latitude: 40.4167,
-    zoom: 4,
+    latitude: 36.4167,
+    zoom: 6,
     maxZoom: 16,
     pitch: 0,
     bearing: 0,

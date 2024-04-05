@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import PaletteService from "../services/palette.service";
 import GeodesicService from "../services/geodesic.service";
+import { getLayerForTime, getPalette } from "../services/api/heatmap.service";
 
-const API_BASE_URL = "http://localhost:8080";
 const HISTOGRAM_THRESHOLD = 8;
 const MIN_THRESHOLDS = {
   WAVE: 15,
@@ -35,20 +35,12 @@ export const useTimeLayersState = create((set, get) => ({
 
   // TODO: y para varios domains?
   setPalette: async () => {
-    const response = await fetch(`${API_BASE_URL}/api/heatmap/palette`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sourceId: get().domains[0].sourceId,
-        domainId: get().domains[0].id,
-        from: "2024-03-21T12:00:00.000Z",
-        to: "2024-03-21T12:00:00.000Z",
-        variables: ["salinity"], // ¿Donde poner la variable? ¿Aqui o en los TimeLayers?
-      }),
-    });
-    const { min, max, histogram } = await response.json();
+    const { min, max, histogram } = await getPalette(
+      get().domains,
+      "2024-03-21T12:00:00.000Z",
+      "2024-03-21T12:00:00.000Z",
+      ["salinity"]
+    );
     get().setPaletteMinMax({ min, max });
     get().setPaletteHistogram(histogram);
     get().setPaletteDistribution(histogram.map((d) => d.value));
@@ -63,36 +55,21 @@ export const useTimeLayersState = create((set, get) => ({
   },
 
   getLayersForTime: async (date) => {
-    const newLayers = [];
+    let newLayers = [];
     for (let domain of get().domains) {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/heatmap/data`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            sourceId: domain.sourceId,
-            domainId: domain.id,
-            date,
-            minValue: get().paletteMinMax.min,
-            maxValue: get().paletteMinMax.max,
-            variables: [get().variable],
-            bounds: {
-              // TODO
-              viewS: null,
-              viewW: null,
-              viewN: null,
-              viewE: null,
-            },
-            zoom: 8, // TODO
-          }),
-        });
-        const { data, latStep, lonStep } = await response.json();
+        const { data, latStep, lonStep } = await getLayerForTime(
+          date,
+          domain,
+          get().paletteMinMax.min,
+          get().paletteMinMax.max,
+          [get().variable]
+        );
         get().setLatLonStep({ latStep, lonStep });
+
         const heatmapLayer = new HeatmapLayer({
           data: data,
-          id: "heatmap-layer",
+          id: `heatmap-layer-${domain.id}`,
           getPosition: (d) => [d[0], d[1]],
           getWeight: (d) => d[2],
           aggregation: "MEAN",

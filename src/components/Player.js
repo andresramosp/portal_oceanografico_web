@@ -1,24 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Slider, Button, DatePicker, Space } from "antd";
+import { PlayCircleOutlined, PauseCircleOutlined } from "@ant-design/icons";
 import "../styles/player.css";
 import { useTimeLayersState } from "../states/TimeLayersState";
 import { usePlayingState } from "../states/PlayingState";
+import useMapState from "../states/MapState";
 
 export const Player = () => {
+  const [showPlayer, setShowPlayer] = useState(false);
+
+  const { viewState } = useMapState((state) => ({
+    viewState: state.viewState,
+    mapStyle: state.mapStyle,
+    setViewState: state.setViewState,
+  }));
+
   const {
     timeIndex,
     setTimeIndex,
     playing,
+    togglePlaying,
     timeInterval,
     initPlayer,
     setPlayerInterval,
-  } = usePlayingState((state) => ({
-    timeIndex: state.timeIndex,
-    setTimeIndex: state.timeIndex,
-    playing: state.playing,
-    timeInterval: state.timeInterval,
-    initPlayer: state.initPlayer,
-    setPlayerInterval: state.setPlayerInterval,
-  }));
+    dateRange,
+  } = usePlayingState((state) => ({ ...state }));
 
   const { getLayersForTime, domains, setPalette } = useTimeLayersState(
     (state) => ({
@@ -28,9 +34,21 @@ export const Player = () => {
     })
   );
 
+  useEffect(() => {
+    if (domains.length) {
+      setShowPlayer(true);
+    } else {
+      setShowPlayer(false);
+    }
+  }, [domains]);
+
   const initPlaying = async (domains) => {
     await Promise.all([setPlayerInterval(domains), setPalette()]);
     initPlayer();
+  };
+
+  const handleDateChange = (dates) => {
+    // setDateRange(dates);
   };
 
   useEffect(() => {
@@ -41,19 +59,34 @@ export const Player = () => {
     if (playing) getLayersForTime(timeInterval[timeIndex]);
   }, [timeIndex]);
 
-  return (
-    <>
-      {playing && (
-        <div className="player-container">
-          <input
-            type="range"
-            min="0"
-            max="23"
-            value={timeIndex}
-            onChange={(e) => setTimeIndex(e.target.value)}
-          />
-        </div>
-      )}
-    </>
-  );
+  useEffect(() => {
+    if (!playing) {
+      getLayersForTime(timeInterval[timeIndex]);
+    }
+  }, [viewState.zoom]);
+
+  return showPlayer ? (
+    <div
+      className="player-container"
+      style={{ background: "blue", padding: "10px" }}
+    >
+      <Space direction="vertical">
+        <Slider
+          min={0}
+          max={23}
+          value={timeIndex}
+          onChange={setTimeIndex}
+          style={{ width: 200 }}
+        />
+        <Button
+          type="primary"
+          icon={playing ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+          onClick={togglePlaying}
+        >
+          {playing ? "Pause" : "Play"}
+        </Button>
+        <DatePicker.RangePicker value={dateRange} onChange={handleDateChange} />
+      </Space>
+    </div>
+  ) : null;
 };

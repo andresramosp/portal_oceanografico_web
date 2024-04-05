@@ -1,33 +1,24 @@
 import React, { useState } from "react";
-import "../styles/mainMenu.css";
+import { Collapse, Checkbox } from "antd";
 import { useTimeLayersState } from "../states/TimeLayersState";
-import { usePlayingState } from "../states/PlayingState";
+import { getDomains } from "../services/api/domain.service";
+import "antd/dist/reset.css";
+import "../styles/mainMenu.css";
+
+const { Panel } = Collapse;
 
 const MainMenu = ({ menuData }) => {
   return (
     <div className="mainMenu-container">
-      {menuData.map((section, index) => (
-        <Accordion key={index} section={section} />
-      ))}
-    </div>
-  );
-};
-
-const Accordion = ({ section }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div>
-      <div className="section-title" onClick={() => setIsOpen(!isOpen)}>
-        {section.sectionName}
-      </div>
-      {isOpen && (
-        <div>
-          {section.options.map((option, index) => (
-            <Option key={index} option={option} />
-          ))}
-        </div>
-      )}
+      <Collapse>
+        {menuData.map((section, index) => (
+          <Panel header={section.sectionName} key={index}>
+            {section.options.map((option, index) => (
+              <Option key={index} option={option} />
+            ))}
+          </Panel>
+        ))}
+      </Collapse>
     </div>
   );
 };
@@ -36,52 +27,41 @@ const Option = ({ option }) => {
   const { setDomains } = useTimeLayersState((state) => ({
     setDomains: state.setDomains,
   }));
+  const [checked, setChecked] = useState(false);
 
-  const API_BASE_URL = "http://localhost:8080";
-
-  const getResource = async (option) => {
+  const onChangeOption = async (e) => {
+    setChecked(e.target.checked); // Actualiza el estado del checkbox
     if (option.resourceType === "heatmap-layer") {
-      const response = await fetch(
-        `${API_BASE_URL}/api/heatmap/domains?variable=${option.variable}&sourceId=${option.sourceId}`
-      );
-      const domains = await response.json();
-      setDomains(domains);
+      if (e.target.checked) {
+        const domains = await getDomains(option);
+        setDomains(domains);
+      } else {
+        setDomains([]);
+      }
     }
   };
 
   if (option.optionType === "actionable") {
     return (
-      <div className="option">
-        <input
-          type="checkbox"
-          id={option.variable}
-          onClick={() => getResource(option)}
-        />
-        <label htmlFor={option.variable}>{option.optionName}</label>
-      </div>
+      <Checkbox
+        onChange={onChangeOption}
+        value={option.variable}
+        checked={checked}
+      >
+        {option.optionName}
+      </Checkbox>
     );
   } else if (option.optionType === "dropdown") {
-    return <Dropdown options={option.options} optionName={option.optionName} />;
-  }
-};
-
-const Dropdown = ({ options, optionName }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="option">
-      <div className="dropdown-title" onClick={() => setIsOpen(!isOpen)}>
-        {optionName} {isOpen ? "-" : "+"}
-      </div>
-      {isOpen && (
-        <div>
-          {options.map((option, index) => (
-            <Option key={index} option={option} />
+    return (
+      <Collapse>
+        <Panel header={option.optionName}>
+          {option.options.map((subOption, index) => (
+            <Option key={index} option={subOption} />
           ))}
-        </div>
-      )}
-    </div>
-  );
+        </Panel>
+      </Collapse>
+    );
+  }
 };
 
 export default MainMenu;
