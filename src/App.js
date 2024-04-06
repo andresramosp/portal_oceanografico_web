@@ -4,12 +4,11 @@ import { Player } from "./components/Player";
 import DeckGLMap from "./components/DeckGLMap";
 import "./App.css";
 import MainMenu from "./components/MainMenu";
-import menuItems from "./resources/menuItems";
 
 export default function App() {
   return (
     <>
-      <MainMenu menuData={menuItems} />
+      <MainMenu />
       <Player />
       <DeckGLMap />
     </>

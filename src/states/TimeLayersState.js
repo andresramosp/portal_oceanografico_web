@@ -17,7 +17,7 @@ const MIN_THRESHOLDS = {
 export const useTimeLayersState = create((set, get) => ({
   domains: [],
   layers: [],
-  variable: "salinity",
+  variable: null,
   latLonStep: { latStep: null, lonStep: null },
   paletteMinMax: { min: null, max: null },
   paletteHistogram: [],
@@ -39,7 +39,7 @@ export const useTimeLayersState = create((set, get) => ({
       get().domains,
       "2024-03-21T12:00:00.000Z",
       "2024-03-21T12:00:00.000Z",
-      ["salinity"]
+      [get().variable]
     );
     get().setPaletteMinMax({ min, max });
     get().setPaletteHistogram(histogram);

@@ -16,7 +16,12 @@
   font-weight: bold;
   margin-bottom: 5px;
   cursor: pointer;
+  color: white;
 }
+
+/* .ant-collapse-header {
+  color: gray !important;
+} */
 
 .option {
   margin-left: 20px;
