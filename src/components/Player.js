@@ -9,11 +9,7 @@ import useMapState from "../states/MapState";
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
 
-  const { viewState } = useMapState((state) => ({
-    viewState: state.viewState,
-    mapStyle: state.mapStyle,
-    setViewState: state.setViewState,
-  }));
+  const { viewState } = useMapState();
 
   const {
     timeIndex,
@@ -24,15 +20,10 @@ export const Player = () => {
     initPlayer,
     setPlayerInterval,
     dateRange,
-  } = usePlayingState((state) => ({ ...state }));
+    stop,
+  } = usePlayingState();
 
-  const { getLayersForTime, domains, setPalette } = useTimeLayersState(
-    (state) => ({
-      getLayersForTime: state.getLayersForTime,
-      domains: state.domains,
-      setPalette: state.setPalette,
-    })
-  );
+  const { getLayersForTime, domains, setPalette } = useTimeLayersState();
 
   useEffect(() => {
     if (domains.length) {
@@ -44,7 +35,7 @@ export const Player = () => {
 
   const initPlaying = async (domains) => {
     await Promise.all([setPlayerInterval(domains), setPalette()]);
-    initPlayer();
+    if (!playing) initPlayer();
   };
 
   const handleDateChange = (dates) => {
@@ -52,7 +43,11 @@ export const Player = () => {
   };
 
   useEffect(() => {
-    if (domains.length) initPlaying(domains);
+    if (domains.length) {
+      initPlaying(domains);
+    } else {
+      stop();
+    }
   }, [domains]);
 
   useEffect(() => {

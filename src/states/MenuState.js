@@ -3,7 +3,13 @@ import menuItems from "../resources/menuItems";
 import { getDomains } from "../services/api/domain.service";
 import { useTimeLayersState } from "./TimeLayersState";
 
-const useMenuState = create((set) => ({
+const {
+  addDomains: addTimeDomains,
+  removeDomains: removeTimeDomains,
+  setVariable,
+} = useTimeLayersState.getState();
+
+const useMenuState = create((set, get) => ({
   menuItems,
   setMenuItems: (menuItems) => set({ menuItems }),
   setOptionValue: async (optionId, value) => {
@@ -20,23 +26,47 @@ const useMenuState = create((set) => ({
 
     if (option) {
       if (value) {
-        await activateOption(option);
+        await get().activateOption(option);
       } else {
-        await deactivateOption(option);
+        await get().deactivateOption(option);
       }
     }
   },
 
+  activateOption: async (option) => {
+    // TODO: en realidad solo hay que desactivar si estoy poniendo un heatmap, las options heatmaps de otras vars
+    // ver como saber si una option es heatmap (o mirar alguno de sus resources con una funcion isHeatMapOption...)
+    let otherVarOptions = get()
+      .getActiveOptions()
+      .filter((opt) => opt.variable != option.variable);
+    for (let otherOpt of otherVarOptions) {
+      get().setOptionValue(otherOpt.id, false);
+    }
+
+    let { timeDomains, featureDomains } = await getDomains(option);
+    if (timeDomains.length) {
+      addTimeDomains(timeDomains);
+      setVariable(option.variable);
+    }
+
+    // if (featureDomains.length) {
+    //   addFeatureDomains(newDomains);
+    // }
+  },
+
+  deactivateOption: async (option) => {
+    removeTimeDomains(option.id);
+    // removeFeatureDomains(option.id)
+  },
+
   getActiveOptions: () => {
-    const allOptions = menuItems.flatMap((section) =>
+    const allOptions = get().menuItems.flatMap((section) =>
       flattenOptions(section.options)
     );
-    return allOptions
-      .filter((option) => option.checked)
-      .map((option) => option.id);
+    return allOptions.filter((option) => option.checked);
   },
   isActive: (optionId) => {
-    const allOptions = menuItems.flatMap((section) =>
+    const allOptions = get().menuItems.flatMap((section) =>
       flattenOptions(section.options)
     );
     return allOptions.some(
@@ -45,8 +75,6 @@ const useMenuState = create((set) => ({
   },
   findOptionById: (optionId) => {},
 }));
-
-const { setDomains, setVariable } = useTimeLayersState.getState();
 
 const updateOptions = (options, optionId, value) => {
   return options.map((option) => {
@@ -71,23 +99,6 @@ const flattenOptions = (options, flattened = []) => {
     }
   });
   return flattened;
-};
-
-const activateOption = async (option) => {
-  if (option.resourceType === "heatmap-layer") {
-    // TODO manejo de logica para quitar opciones no compatibles (dos variables distintas nunca lo son en heatmaps),
-    // y que los domains se añadan a los previos si los hay
-    const domains = await getDomains(option);
-    setVariable(option.variable);
-    setDomains(domains);
-  }
-};
-
-const deactivateOption = async (option) => {
-  if (option.resourceType === "heatmap-layer") {
-    // TODO manejo de logica para quitar solo dominios / layers de esta option
-    setDomains([]);
-  }
 };
 
 const findOptionById = (menuItems, optionId) => {

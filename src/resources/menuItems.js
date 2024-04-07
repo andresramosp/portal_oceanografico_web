@@ -3,27 +3,65 @@ export default [
     sectionName: "Oceanografía",
     options: [
       {
-        id: "pde-salinity",
-        optionName: "Salinidad PdE",
+        id: "pde-salinity-GIB",
+        optionName: "Salinidad PdE GIB",
         optionType: "actionable",
         variable: "salinity",
-        sourceId: "pde",
-        resourceType: "heatmap-layer",
+        mapResources: [
+          {
+            id: "pde-salinity-gibreg",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/GIB-REG",
+          },
+          // {
+          //   id: "pde-salinity-alm",
+          //   sourceId: "pde",
+          //   resourceType: "heatmap",
+          //   url: "/ALM-CST",
+          // },
+        ],
+      },
+      {
+        id: "pde-salinity-ALM",
+        optionName: "Salinidad PdE ALM",
+        optionType: "actionable",
+        variable: "salinity",
+        mapResources: [
+          // {
+          //   id: "pde-salinity-gibreg",
+          //   sourceId: "pde",
+          //   resourceType: "heatmap",
+          //   url: "/GIB-REG",
+          // },
+          {
+            id: "pde-salinity-alm",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/ALM-CST",
+          },
+        ],
       },
       {
         id: "pde-temperature",
         optionName: "Temperatura PdE",
         optionType: "actionable",
         variable: "temperature",
-        sourceId: "pde",
-        resourceType: "heatmap-layer",
+        mapResources: [
+          {
+            id: "pde-temperature",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: null, // traerá domains por variable y sourceId
+          },
+        ],
       },
       {
         id: "copernicus-wind",
         optionName: "Viento Copernicus",
         optionType: "actionable",
         variable: "wind",
-        resourceType: "heatmap-layer",
+        resourceType: "heatmap",
       },
       {
         optionName: "Dispositivos Southtek",
@@ -62,7 +100,7 @@ export default [
             optionType: "actionable",
             variable: "geological",
             sourceId: "IGEO",
-            resourceType: "feature-layer",
+            resourceType: "feature",
           },
           {
             id: "IGEO-coast",
@@ -70,7 +108,7 @@ export default [
             optionType: "actionable",
             variable: "geological",
             sourceId: "IGEO",
-            resourceType: "feature-layer",
+            resourceType: "feature",
           },
         ],
       },

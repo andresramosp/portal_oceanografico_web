@@ -7,7 +7,7 @@ import useMenuState from "../states/MenuState";
 const { Panel } = Collapse;
 
 const MainMenu = () => {
-  const { menuItems } = useMenuState((state) => ({ ...state }));
+  const { menuItems } = useMenuState();
   return (
     <div className="mainMenu-container">
       <Collapse>

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getDateRange } from "../services/api/heatmap.service";
+import zukeeper from "zukeeper";
 
 export const usePlayingState = create((set, get) => ({
   timeIndex: 0,
@@ -61,6 +62,7 @@ export const usePlayingState = create((set, get) => ({
   },
 
   stop: () => {
+    get().setPlaying(false);
     clearTimeout(get().animationFrameSetTimeoutId);
     cancelAnimationFrame(get().animationFrameId);
   },
@@ -89,3 +91,5 @@ export const usePlayingState = create((set, get) => ({
     set({ timeInterval: result.map((d) => d.toJSON()) });
   },
 }));
+
+// window.store = usePlayingState;
