@@ -1,8 +1,10 @@
 import { create } from "zustand";
-import { getDateRange } from "../services/api/heatmap.service";
+import { getDateRange as getHeatmapDateRange } from "../services/api/heatmap.service";
+import { getDateRange as getTilemapDateRange } from "../services/api/tilemap.service";
 import zukeeper from "zukeeper";
 
 export const usePlayingState = create((set, get) => ({
+  domainType: "",
   timeIndex: 0,
   minDateFrom: null,
   maxDateFrom: null,
@@ -15,6 +17,7 @@ export const usePlayingState = create((set, get) => ({
   animationFrameId: null,
   animationFrameSetTimeoutId: null,
 
+  setDomainType: (domainType) => set({ domainType }),
   setTimeIndex: (timeIndex) => set({ timeIndex }),
   setPlaying: (playing) => set({ playing }),
   setMinDateFrom: (minDateFrom) => set({ minDateFrom }),
@@ -28,7 +31,10 @@ export const usePlayingState = create((set, get) => ({
 
   setPlayerInterval: async (domains) => {
     // Sacamos fecha max y min del conjunto de domimios (para los selects)
-    const { minDate, maxDate } = await getDateRange(domains);
+    const { minDate, maxDate } =
+      get().domainType == "heatmap"
+        ? await getHeatmapDateRange(domains)
+        : await getTilemapDateRange(domains);
     get().setMinDateFrom(minDate);
     get().setMaxDateFrom(maxDate);
     // TODO: Establecemos reproduccion de ultima semana de ese rango

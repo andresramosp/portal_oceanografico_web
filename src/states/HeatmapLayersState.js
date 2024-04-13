@@ -16,7 +16,7 @@ const MIN_THRESHOLDS = {
   WIND: 8,
 };
 
-export const useTimeLayersState = create(
+export const useHeatmapLayersState = create(
   zukeeper((set, get) => ({
     domains: [],
     variable: null,
@@ -55,6 +55,7 @@ export const useTimeLayersState = create(
     },
 
     getLayersForTime: async (date) => {
+      const mapState = useMapState.getState();
       let newLayers = [];
       for (let domain of get().domains) {
         try {
@@ -99,8 +100,7 @@ export const useTimeLayersState = create(
           console.error("Error fetching data:", error);
         }
       }
-      const mapState = useMapState.getState();
-      mapState.setLayers(newLayers);
+      mapState.addOrUpdateLayers(newLayers);
     },
 
     addDomains: (newDomains) => {
@@ -116,4 +116,4 @@ export const useTimeLayersState = create(
   }))
 );
 
-window.store = useTimeLayersState;
+window.store = useHeatmapLayersState;

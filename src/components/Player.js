@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Slider, Button, DatePicker, Space } from "antd";
 import { PlayCircleOutlined, PauseCircleOutlined } from "@ant-design/icons";
 import "../styles/player.css";
-import { useTimeLayersState } from "../states/TimeLayersState";
+import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 import { usePlayingState } from "../states/PlayingState";
 import useMapState from "../states/MapState";
+import { useTilemapLayersState } from "../states/TilemapLayersState";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
@@ -12,6 +13,8 @@ export const Player = () => {
   const { viewState } = useMapState();
 
   const {
+    domainType,
+    setDomainType,
     timeIndex,
     setTimeIndex,
     playing,
@@ -23,55 +26,69 @@ export const Player = () => {
     stop,
   } = usePlayingState();
 
-  const { getLayersForTime, domains, setPalette } = useTimeLayersState();
+  const {
+    getLayersForTime: getHeatmapLayersForTime,
+    domains: heatmapDomains,
+    setPalette,
+  } = useHeatmapLayersState();
 
-  useEffect(() => {
-    if (domains.length) {
-      setShowPlayer(true);
-    } else {
-      setShowPlayer(false);
-    }
-  }, [domains]);
-
-  const initPlaying = async (domains) => {
-    await Promise.all([setPlayerInterval(domains), setPalette()]);
-    if (!playing) initPlayer();
-  };
+  const { getLayersForTime: getTileLayersForTime, domains: tilemapDomains } =
+    useTilemapLayersState();
 
   const handleDateChange = (dates) => {
     // setDateRange(dates);
   };
 
-  useEffect(() => {
-    if (domains.length) {
-      initPlaying(domains);
-    } else {
-      stop();
-    }
-  }, [domains]);
+  const getLayersForTime = (timeIndex) => {
+    let time = timeInterval[timeIndex];
+    if (domainType == "tilemap") getTileLayersForTime(time);
+    if (domainType == "heatmap") getHeatmapLayersForTime(time);
+  };
+
+  const initHeatmapPlayer = async (domains) => {
+    setDomainType("heatmap");
+    await Promise.all([setPlayerInterval(domains), setPalette()]);
+    if (!playing) initPlayer();
+  };
+
+  const initTilemapPlayer = async (domains) => {
+    setDomainType("tilemap");
+    await setPlayerInterval(domains);
+    if (!playing) initPlayer();
+  };
 
   useEffect(() => {
-    if (playing) getLayersForTime(timeInterval[timeIndex]);
+    if (heatmapDomains.length) {
+      initHeatmapPlayer(heatmapDomains);
+      setShowPlayer(true);
+    } else if (tilemapDomains.length) {
+      initTilemapPlayer(tilemapDomains);
+      setShowPlayer(true);
+    } else {
+      stop();
+      setShowPlayer(false);
+    }
+  }, [heatmapDomains, tilemapDomains]);
+
+  useEffect(() => {
+    getLayersForTime(timeIndex);
   }, [timeIndex]);
 
   useEffect(() => {
     if (!playing) {
-      getLayersForTime(timeInterval[timeIndex]);
+      getLayersForTime(timeIndex);
     }
   }, [viewState.zoom]);
 
   return showPlayer ? (
-    <div
-      className="player-container"
-      style={{ background: "blue", padding: "10px" }}
-    >
+    <div className="player-container">
       <Space direction="vertical">
         <Slider
           min={0}
           max={23}
           value={timeIndex}
           onChange={setTimeIndex}
-          style={{ width: 200 }}
+          style={{ width: "98%" }}
         />
         <Button
           type="primary"

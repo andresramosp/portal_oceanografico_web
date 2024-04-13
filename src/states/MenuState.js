@@ -1,13 +1,20 @@
 import { create } from "zustand";
 import menuItems from "../resources/menuItems";
 import { getDomains } from "../services/api/domain.service";
-import { useTimeLayersState } from "./TimeLayersState";
+import { useHeatmapLayersState } from "./HeatmapLayersState";
+import { useTilemapLayersState } from "./TilemapLayersState";
 
 const {
-  addDomains: addTimeDomains,
-  removeDomains: removeTimeDomains,
-  setVariable,
-} = useTimeLayersState.getState();
+  addDomains: addHeatmapDomains,
+  removeDomains: removeHeatmapDomains,
+  setVariable: setHeatmapVariable,
+} = useHeatmapLayersState.getState();
+
+const {
+  addDomains: addTilemapDomains,
+  removeDomains: removeTilemapDomains,
+  setVariable: setTilemapVariable,
+} = useTilemapLayersState.getState();
 
 const useMenuState = create((set, get) => ({
   menuItems,
@@ -42,20 +49,25 @@ const useMenuState = create((set, get) => ({
     for (let otherOpt of otherVarOptions) {
       get().setOptionValue(otherOpt.id, false);
     }
-
-    let { timeDomains, featureDomains } = await getDomains(option);
-    if (timeDomains.length) {
-      addTimeDomains(timeDomains);
-      setVariable(option.variable);
+    let { heatmapDomains, tilemapDomains, featureDomains } = await getDomains(
+      option
+    );
+    if (heatmapDomains.length) {
+      addHeatmapDomains(heatmapDomains);
+      setHeatmapVariable(option.variable);
     }
-
+    if (tilemapDomains.length) {
+      addTilemapDomains(tilemapDomains);
+      setTilemapVariable(option.variable);
+    }
     // if (featureDomains.length) {
     //   addFeatureDomains(newDomains);
     // }
   },
 
   deactivateOption: async (option) => {
-    removeTimeDomains(option.id);
+    removeHeatmapDomains(option.id);
+    removeTilemapDomains(option.id);
     // removeFeatureDomains(option.id)
   },
 

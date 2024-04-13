@@ -57,6 +57,20 @@ export default [
         ],
       },
       {
+        id: "pde-wave",
+        optionName: "Oleaje Tiles PdE",
+        optionType: "actionable",
+        variable: "wave",
+        mapResources: [
+          {
+            id: "pde-wave",
+            sourceId: "pde",
+            resourceType: "tilemap",
+            url: null, // traerá domains por variable y sourceId
+          },
+        ],
+      },
+      {
         id: "copernicus-wind",
         optionName: "Viento Copernicus",
         optionType: "actionable",

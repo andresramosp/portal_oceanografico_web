@@ -32,9 +32,8 @@ export const getDomains = async (option) => {
   });
 
   return {
-    timeDomains: result.filter(
-      (d) => d.domainType == "heatmap" || d.domainType == "tilemap"
-    ),
+    heatmapDomains: result.filter((d) => d.domainType == "heatmap"),
+    tilemapDomains: result.filter((d) => d.domainType == "tilemap"),
     featureDomains: result.filter((d) => d.domainType == "feature"),
   };
 };
