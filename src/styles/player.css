@@ -7,4 +7,15 @@
     left: 10px;
     z-index: 1;
   }
+
+  .player-info {
+    display: flex;
+    column-gap: 10px;
+    flex-direction: row;
+    align-content: stretch;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+}
   

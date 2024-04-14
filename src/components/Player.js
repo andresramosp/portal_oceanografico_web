@@ -20,10 +20,11 @@ export const Player = () => {
     playing,
     togglePlaying,
     timeInterval,
-    initPlayer,
+    play,
     setPlayerInterval,
     dateRange,
     stop,
+    hourGap,
   } = usePlayingState();
 
   const {
@@ -48,13 +49,27 @@ export const Player = () => {
   const initHeatmapPlayer = async (domains) => {
     setDomainType("heatmap");
     await Promise.all([setPlayerInterval(domains), setPalette()]);
-    if (!playing) initPlayer();
+    if (!playing) play();
   };
 
   const initTilemapPlayer = async (domains) => {
     setDomainType("tilemap");
     await setPlayerInterval(domains);
-    if (!playing) initPlayer();
+    if (!playing) play();
+  };
+
+  const getDateString = (jsonDateStr) => {
+    const date = new Date(jsonDateStr);
+    return date
+      .toLocaleDateString("es-ES", {
+        timeZone: "UTC", // Asegura que la fecha/hora sea en UTC
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "");
   };
 
   useEffect(() => {
@@ -75,7 +90,7 @@ export const Player = () => {
   }, [timeIndex]);
 
   useEffect(() => {
-    if (!playing) {
+    if (!playing && domainType == "heatmap") {
       getLayersForTime(timeIndex);
     }
   }, [viewState.zoom]);
@@ -85,18 +100,23 @@ export const Player = () => {
       <Space direction="vertical">
         <Slider
           min={0}
-          max={23}
+          max={timeInterval.length - 1}
+          step={hourGap}
           value={timeIndex}
           onChange={setTimeIndex}
           style={{ width: "98%" }}
         />
-        <Button
-          type="primary"
-          icon={playing ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-          onClick={togglePlaying}
-        >
-          {playing ? "Pause" : "Play"}
-        </Button>
+        <div className="player-info">
+          <Button
+            type="primary"
+            icon={playing ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+            onClick={togglePlaying}
+          >
+            {playing ? "Pause" : "Play"}
+          </Button>
+          <span> {getDateString(timeInterval[timeIndex])}</span>
+        </div>
+
         <DatePicker.RangePicker value={dateRange} onChange={handleDateChange} />
       </Space>
     </div>

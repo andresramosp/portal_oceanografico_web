@@ -5,13 +5,13 @@ import zukeeper from "zukeeper";
 
 export const usePlayingState = create((set, get) => ({
   domainType: "",
-  timeIndex: 0,
+  timeIndex: -1,
   minDateFrom: null,
   maxDateFrom: null,
   dateFrom: null,
   dateTo: null,
   playing: false,
-  delay: 2000,
+  delay: 5000,
   timeInterval: [],
   hourGap: 1,
   animationFrameId: null,
@@ -41,13 +41,8 @@ export const usePlayingState = create((set, get) => ({
     get().setDateFrom(minDate);
     get().setDateTo(maxDate);
 
-    set({ timeIndex: 0 });
+    set({ timeIndex: -1 });
     get().getTimeIntervalArray();
-  },
-
-  initPlayer: () => {
-    set({ playing: true });
-    get().play();
   },
 
   togglePlaying: () => {
@@ -60,11 +55,9 @@ export const usePlayingState = create((set, get) => ({
   },
 
   play: () => {
-    const timeoutId = setTimeout(() => {
-      const frameId = requestAnimationFrame(get().forward);
-      set({ animationFrameId: frameId });
-    }, get().delay);
-    set({ animationFrameSetTimeoutId: timeoutId });
+    set({ playing: true });
+    const frameId = requestAnimationFrame(get().forward);
+    set({ animationFrameId: frameId });
   },
 
   stop: () => {
@@ -81,7 +74,11 @@ export const usePlayingState = create((set, get) => ({
           : state.timeIndex + 1;
       return { timeIndex: newIndex };
     });
-    get().play();
+    const timeoutId = setTimeout(() => {
+      const frameId = requestAnimationFrame(get().forward);
+      set({ animationFrameId: frameId });
+    }, get().delay);
+    set({ animationFrameSetTimeoutId: timeoutId });
   },
 
   getTimeIntervalArray: () => {
@@ -89,12 +86,13 @@ export const usePlayingState = create((set, get) => ({
     let currentDate = new Date(get().dateFrom);
     currentDate.setUTCHours(0, 0, 0, 0);
     let stopDate = new Date(get().dateTo);
-    while (currentDate < stopDate) {
+    while (currentDate <= stopDate) {
       result.push(new Date(currentDate)); // Crear una nueva instancia de Date
       currentDate.setHours(currentDate.getHours() + get().hourGap);
     }
 
     set({ timeInterval: result.map((d) => d.toJSON()) });
+    console.log(result.map((d) => d.toJSON()));
   },
 }));
 

@@ -14,12 +14,6 @@ export default [
             resourceType: "heatmap",
             url: "/GIB-REG",
           },
-          // {
-          //   id: "pde-salinity-alm",
-          //   sourceId: "pde",
-          //   resourceType: "heatmap",
-          //   url: "/ALM-CST",
-          // },
         ],
       },
       {
@@ -28,12 +22,6 @@ export default [
         optionType: "actionable",
         variable: "salinity",
         mapResources: [
-          // {
-          //   id: "pde-salinity-gibreg",
-          //   sourceId: "pde",
-          //   resourceType: "heatmap",
-          //   url: "/GIB-REG",
-          // },
           {
             id: "pde-salinity-alm",
             sourceId: "pde",
@@ -57,13 +45,13 @@ export default [
         ],
       },
       {
-        id: "pde-wave",
-        optionName: "Oleaje Tiles PdE",
+        id: "pde-currents",
+        optionName: "Corrientes Tiles PdE",
         optionType: "actionable",
-        variable: "wave",
+        variable: "currents",
         mapResources: [
           {
-            id: "pde-wave",
+            id: "pde-currents",
             sourceId: "pde",
             resourceType: "tilemap",
             url: null, // traerá domains por variable y sourceId

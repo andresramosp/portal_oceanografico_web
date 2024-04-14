@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer } from "@deck.gl/layers";
 import useMapState from "./MapState";
+import { formatDate } from "../services/api/tilemap.service";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -18,18 +19,21 @@ export const useTilemapLayersState = create((set, get) => ({
     const mapState = useMapState.getState();
     let newLayers = [];
     for (let domain of get().domains) {
+      let url =
+        `${API_BASE_URL}/api/tilemap/tiles/` +
+        domain.url.replace("{t}", formatDate(date));
       const tileLayer = new TileLayer({
-        id: "TileLayer",
-        data: `${API_BASE_URL}/api/tilemap/tiles/${domain.url.replace(
-          "{t}",
-          "2024041309"
-        )}`,
-        maxZoom: 19,
-        minZoom: 0,
-
+        id: `tilelayer-layer-${domain.id}`,
+        data: url,
+        // maxZoom: domain.zoomMax,
+        // minZoom: domain.zoomMin,
+        maxCacheSize: 20,
+        tileSize: 256,
+        userData: {
+          option: domain.option,
+        },
         renderSubLayers: (props) => {
           const { boundingBox } = props.tile;
-
           return new BitmapLayer(props, {
             data: null,
             image: props.data,
