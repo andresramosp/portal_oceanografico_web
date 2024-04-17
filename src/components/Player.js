@@ -6,6 +6,7 @@ import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 import { usePlayingState } from "../states/PlayingState";
 import useMapState from "../states/MapState";
 import { useTilemapLayersState } from "../states/TilemapLayersState";
+import { PlayerLegend } from "./PlayerLegend";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
@@ -97,6 +98,7 @@ export const Player = () => {
 
   return showPlayer ? (
     <div className="player-container">
+      <PlayerLegend />
       <Space direction="vertical">
         <Slider
           min={0}

@@ -18,4 +18,16 @@
     align-items: center;
     color: white;
 }
+
+color-legend.styled {
+  --cle-font-family: serif;
+  --cle-font-family-title: Impact;
+  --cle-letter-spacing-title: 0.5px;
+  --cle-font-weight: 500;
+  --cle-color: black;
+  --cle-background: transparent;
+  --cle-border-radius: 6px;
+  --cle-padding: 0.15rem 0rem 0rem;
+  --cle-font-size: 0.7rem !important;
+}
   
