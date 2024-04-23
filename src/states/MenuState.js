@@ -3,6 +3,7 @@ import menuItems from "../resources/menuItems";
 import { getDomains } from "../services/api/domain.service";
 import { useHeatmapLayersState } from "./HeatmapLayersState";
 import { useTilemapLayersState } from "./TilemapLayersState";
+import { useGeoJSONLayersState } from "./GeoJSONLayersState";
 
 const {
   addDomains: addHeatmapDomains,
@@ -15,6 +16,9 @@ const {
   removeDomains: removeTilemapDomains,
   setVariable: setTilemapVariable,
 } = useTilemapLayersState.getState();
+
+const { addDomains: addGeoJSONDomains, removeDomains: removeGeoJSONDomains } =
+  useGeoJSONLayersState.getState();
 
 const useMenuState = create((set, get) => ({
   menuItems,
@@ -49,7 +53,7 @@ const useMenuState = create((set, get) => ({
     for (let otherOpt of otherVarOptions) {
       get().setOptionValue(otherOpt.id, false);
     }
-    let { heatmapDomains, tilemapDomains, featureDomains } = await getDomains(
+    let { heatmapDomains, tilemapDomains, geoJSONDomains } = await getDomains(
       option
     );
     if (heatmapDomains.length) {
@@ -60,15 +64,16 @@ const useMenuState = create((set, get) => ({
       addTilemapDomains(tilemapDomains);
       setTilemapVariable(option.variable);
     }
-    // if (featureDomains.length) {
-    //   addFeatureDomains(newDomains);
-    // }
+    debugger;
+    if (geoJSONDomains.length) {
+      addGeoJSONDomains(geoJSONDomains);
+    }
   },
 
   deactivateOption: async (option) => {
     removeHeatmapDomains(option.id);
     removeTilemapDomains(option.id);
-    // removeFeatureDomains(option.id)
+    removeGeoJSONDomains(option.id);
   },
 
   getActiveOptions: () => {

@@ -111,6 +111,14 @@ export default [
             variable: "geological",
             sourceId: "IGEO",
             resourceType: "feature",
+            mapResources: [
+              {
+                id: "IGEO-coast",
+                sourceId: "igeo",
+                resourceType: "geojson",
+                url: null,
+              },
+            ],
           },
         ],
       },

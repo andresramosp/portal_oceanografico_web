@@ -69,7 +69,7 @@ export const useHeatmapLayersState = create(
           get().setLatLonStep({ latStep, lonStep });
 
           const heatmapLayer = new HeatmapLayer({
-            data: data,
+            data,
             id: `heatmap-layer-${domain.id}`,
             getPosition: (d) => [d[0], d[1]],
             getWeight: (d) => d[2],

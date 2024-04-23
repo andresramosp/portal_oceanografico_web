@@ -34,6 +34,6 @@ export const getDomains = async (option) => {
   return {
     heatmapDomains: result.filter((d) => d.domainType == "heatmap"),
     tilemapDomains: result.filter((d) => d.domainType == "tilemap"),
-    featureDomains: result.filter((d) => d.domainType == "feature"),
+    geoJSONDomains: result.filter((d) => d.domainType == "geojson"),
   };
 };
