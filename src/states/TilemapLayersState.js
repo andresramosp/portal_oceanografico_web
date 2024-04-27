@@ -59,8 +59,10 @@ export const useTilemapLayersState = create((set, get) => ({
 
   removeDomains: (optionId) => {
     let newDomains = get().domains.filter((d) => d.option.id != optionId);
-    get().setDomains(newDomains);
-    const mapState = useMapState.getState();
-    mapState.removeLayers(optionId);
+    if (newDomains.length != get().domains.length) {
+      get().setDomains(newDomains);
+      const mapState = useMapState.getState();
+      mapState.removeLayers(optionId);
+    }
   },
 }));

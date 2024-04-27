@@ -47,12 +47,20 @@ const useMenuState = create((set, get) => ({
   activateOption: async (option) => {
     // TODO: en realidad solo hay que desactivar si estoy poniendo un heatmap, las options heatmaps de otras vars
     // ver como saber si una option es heatmap (o mirar alguno de sus resources con una funcion isHeatMapOption...)
-    let otherVarOptions = get()
-      .getActiveOptions()
-      .filter((opt) => opt.variable != option.variable);
-    for (let otherOpt of otherVarOptions) {
-      get().setOptionValue(otherOpt.id, false);
+    if (get().optionHasType(option, "heatmap")) {
+      let otherHeatmapVarOptions = get()
+        .getActiveOptions()
+        .filter(
+          (opt) =>
+            get().optionHasType(opt, "heatmap") &&
+            opt.variable != option.variable
+        );
+      for (let otherOpt of otherHeatmapVarOptions) {
+        console.log("desactivando ", otherOpt.optionName);
+        get().setOptionValue(otherOpt.id, false);
+      }
     }
+
     let { heatmapDomains, tilemapDomains, geoJSONDomains } = await getDomains(
       option
     );
@@ -64,7 +72,6 @@ const useMenuState = create((set, get) => ({
       addTilemapDomains(tilemapDomains);
       setTilemapVariable(option.variable);
     }
-    debugger;
     if (geoJSONDomains.length) {
       addGeoJSONDomains(geoJSONDomains);
     }
@@ -74,6 +81,10 @@ const useMenuState = create((set, get) => ({
     removeHeatmapDomains(option.id);
     removeTilemapDomains(option.id);
     removeGeoJSONDomains(option.id);
+  },
+
+  optionHasType: (option, type) => {
+    return option.mapResources.some((mr) => mr.resourceType == type);
   },
 
   getActiveOptions: () => {

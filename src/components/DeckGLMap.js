@@ -15,6 +15,7 @@ export default function DeckGLMap() {
       initialViewState={viewState}
       onViewStateChange={onViewStateChange}
       controller={true}
+      getTooltip={({ object }) => object && object.tooltip}
       layers={layers}
     >
       <Map

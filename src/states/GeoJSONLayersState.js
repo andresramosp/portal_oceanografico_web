@@ -16,25 +16,29 @@ export const useGeoJSONLayersState = create((set, get) => ({
 
       const geoJsonLayer = new GeoJsonLayer({
         id: "GeoJsonLayer",
-        data,
-
+        data: {
+          ...data,
+          features: data.features.map((f) => {
+            return {
+              ...f,
+              tooltip: f.properties.IdadeSupe + " - " + f.properties.IdadeInfe,
+            };
+          }),
+        },
         stroked: false,
         filled: true,
-        pointType: "circle+text",
         pickable: true,
-
-        getFillColor: [160, 160, 180, 200],
-        getLineColor: (f) => {
-          const hex = f.properties.color;
-          // convert to RGB
-          return hex
-            ? hex.match(/[0-9a-f]{2}/g).map((x) => parseInt(x, 16))
-            : [0, 0, 0];
-        },
+        getFillColor: (f) => [
+          f.properties.Red,
+          f.properties.Green,
+          f.properties.Blue,
+          200,
+        ],
         getLineWidth: 20,
         getPointRadius: 4,
-        getText: (f) => f.properties.name,
-        getTextSize: 12,
+        userData: {
+          option: domain.option,
+        },
       });
 
       newLayers.push(geoJsonLayer);
@@ -49,8 +53,10 @@ export const useGeoJSONLayersState = create((set, get) => ({
 
   removeDomains: (optionId) => {
     let newDomains = get().domains.filter((d) => d.option.id != optionId);
-    get().setDomains(newDomains);
-    const mapState = useMapState.getState();
-    mapState.removeLayers(optionId);
+    if (newDomains.length != get().domains.length) {
+      get().setDomains(newDomains);
+      const mapState = useMapState.getState();
+      mapState.removeLayers(optionId);
+    }
   },
 }));
