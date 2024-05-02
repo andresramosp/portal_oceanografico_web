@@ -17,6 +17,20 @@ export default [
         ],
       },
       {
+        id: "pde-currents-GIB",
+        optionName: "Corrientes PdE GIB",
+        optionType: "actionable",
+        variable: "currents",
+        mapResources: [
+          {
+            id: "pde-currents-particles-GIB",
+            sourceId: "pde",
+            resourceType: "particles",
+            url: "/GIB-REG",
+          },
+        ],
+      },
+      {
         id: "pde-salinity-ALM",
         optionName: "Salinidad PdE ALM",
         optionType: "actionable",

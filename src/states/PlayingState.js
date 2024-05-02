@@ -11,7 +11,7 @@ export const usePlayingState = create((set, get) => ({
   dateFrom: null,
   dateTo: null,
   playing: false,
-  delay: 3000,
+  delay: 10000,
   timeInterval: [],
   hourGap: 1,
   animationFrameId: null,

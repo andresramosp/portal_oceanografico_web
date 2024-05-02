@@ -4,6 +4,7 @@ import { getDomains } from "../services/api/domain.service";
 import { useHeatmapLayersState } from "./HeatmapLayersState";
 import { useTilemapLayersState } from "./TilemapLayersState";
 import { useGeoJSONLayersState } from "./GeoJSONLayersState";
+import { useParticlesLayersState } from "./ParticlesLayersState";
 
 const {
   addDomains: addHeatmapDomains,
@@ -16,6 +17,12 @@ const {
   removeDomains: removeTilemapDomains,
   setVariable: setTilemapVariable,
 } = useTilemapLayersState.getState();
+
+const {
+  addDomains: addParticlesDomains,
+  removeDomains: removeParticlesDomains,
+  setVariable: setParticlesVariable,
+} = useParticlesLayersState.getState();
 
 const { addDomains: addGeoJSONDomains, removeDomains: removeGeoJSONDomains } =
   useGeoJSONLayersState.getState();
@@ -61,12 +68,15 @@ const useMenuState = create((set, get) => ({
       }
     }
 
-    let { heatmapDomains, tilemapDomains, geoJSONDomains } = await getDomains(
-      option
-    );
+    let { heatmapDomains, particlesDomains, tilemapDomains, geoJSONDomains } =
+      await getDomains(option);
     if (heatmapDomains.length) {
       addHeatmapDomains(heatmapDomains);
       setHeatmapVariable(option.variable);
+    }
+    if (particlesDomains.length) {
+      addParticlesDomains(particlesDomains);
+      setParticlesVariable(option.variable);
     }
     if (tilemapDomains.length) {
       addTilemapDomains(tilemapDomains);

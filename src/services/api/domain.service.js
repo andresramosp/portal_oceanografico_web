@@ -30,9 +30,9 @@ export const getDomains = async (option) => {
   result = result.map((d) => {
     return { ...d, option };
   });
-
   return {
     heatmapDomains: result.filter((d) => d.domainType == "heatmap"),
+    particlesDomains: result.filter((d) => d.domainType == "particles"),
     tilemapDomains: result.filter((d) => d.domainType == "tilemap"),
     geoJSONDomains: result.filter((d) => d.domainType == "geojson"),
   };

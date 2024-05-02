@@ -7,6 +7,7 @@ import { usePlayingState } from "../states/PlayingState";
 import useMapState from "../states/MapState";
 import { useTilemapLayersState } from "../states/TilemapLayersState";
 import { PlayerLegend } from "./PlayerLegend";
+import { useParticlesLayersState } from "../states/ParticlesLayersState";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
@@ -14,7 +15,6 @@ export const Player = () => {
   const { viewState } = useMapState();
 
   const {
-    domainType,
     setDomainType,
     timeIndex,
     setTimeIndex,
@@ -37,19 +37,31 @@ export const Player = () => {
   const { getLayersForTime: getTileLayersForTime, domains: tilemapDomains } =
     useTilemapLayersState();
 
+  const {
+    getLayersForTime: getParticlesLayersForTime,
+    domains: particlesDomains,
+  } = useParticlesLayersState();
+
   const handleDateChange = (dates) => {
     // setDateRange(dates);
   };
 
   const getLayersForTime = (timeIndex) => {
     let time = timeInterval[timeIndex];
-    if (domainType == "tilemap") getTileLayersForTime(time);
-    if (domainType == "heatmap") getHeatmapLayersForTime(time);
+    if (tilemapDomains.length) getTileLayersForTime(time);
+    if (heatmapDomains.length) getHeatmapLayersForTime(time);
+    if (particlesDomains.length) getParticlesLayersForTime(time);
   };
 
   const initHeatmapPlayer = async (domains) => {
     setDomainType("heatmap");
     await Promise.all([setPlayerInterval(domains), setPalette()]);
+    if (!playing) play();
+  };
+
+  const initParticlesPlayer = async (domains) => {
+    setDomainType("heatmap"); // De momento lo dejamos como heatmap ya que leerá de los mismos ficheros
+    await Promise.all([setPlayerInterval(domains)]);
     if (!playing) play();
   };
 
@@ -74,24 +86,34 @@ export const Player = () => {
   };
 
   useEffect(() => {
-    if (heatmapDomains.length) {
-      initHeatmapPlayer(heatmapDomains);
-      setShowPlayer(true);
-    } else if (tilemapDomains.length) {
-      initTilemapPlayer(tilemapDomains);
-      setShowPlayer(true);
-    } else {
+    if (
+      !heatmapDomains.length &&
+      !tilemapDomains.length &&
+      !particlesDomains.length
+    ) {
       stop();
       setShowPlayer(false);
     }
-  }, [heatmapDomains, tilemapDomains]);
+    if (heatmapDomains.length) {
+      initHeatmapPlayer(heatmapDomains);
+      setShowPlayer(true);
+    }
+    if (tilemapDomains.length) {
+      initTilemapPlayer(tilemapDomains);
+      setShowPlayer(true);
+    }
+    if (particlesDomains.length) {
+      initParticlesPlayer(particlesDomains);
+      setShowPlayer(true);
+    }
+  }, [heatmapDomains, tilemapDomains, particlesDomains]);
 
   useEffect(() => {
     getLayersForTime(timeIndex);
   }, [timeIndex]);
 
   useEffect(() => {
-    if (!playing && domainType == "heatmap") {
+    if (!playing && heatmapDomains.length) {
       getLayersForTime(timeIndex);
     }
   }, [viewState.zoom]);
