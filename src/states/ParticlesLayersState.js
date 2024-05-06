@@ -21,18 +21,17 @@ export const useParticlesLayersState = create((set, get) => ({
         date,
         variableId: get().variable,
       });
-      debugger;
       const url = "http://localhost:3000/data.png"; //`${API_BASE_URL}/api/particles/data?${queryParams.toString()}`;
       const image = await WeatherLayers.loadTextureData(url, false);
       const particleLayer = new WeatherLayers.ParticleLayer({
         id: "particle",
         image,
-        // bounds: [domain.limN, domain.limE, domain.limS, domain.limW],
         bounds: [domain.limW, domain.limS, domain.limE, domain.limN],
-
-        // extensions: [new ClipExtension()],
-        // clipBounds: [-181, -85.051129, 181, 85.051129],
-        imageUnscale: [-128, 127],
+        numParticles: 5000,
+        imageUnscale: [-0.186 * 70, 0.27600002 * 70],
+        maxAge: 25,
+        width: 2,
+        speedFactor: 5,
       });
       newLayers.push(particleLayer);
     }
