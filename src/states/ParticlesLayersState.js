@@ -21,8 +21,12 @@ export const useParticlesLayersState = create((set, get) => ({
         date,
         variableId: get().variable,
       });
-      const url = "http://localhost:3000/data.png"; //`${API_BASE_URL}/api/particles/data?${queryParams.toString()}`;
-      const image = await WeatherLayers.loadTextureData(url, false);
+      let response = await fetch(
+        `${API_BASE_URL}/api/particles/generateImage?${queryParams}`
+      );
+      let imageUrl = await response.text();
+
+      const image = await WeatherLayers.loadTextureData(imageUrl, false);
       const particleLayer = new WeatherLayers.ParticleLayer({
         id: "particle",
         image,
