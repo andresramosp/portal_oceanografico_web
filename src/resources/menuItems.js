@@ -28,22 +28,34 @@ export default [
             resourceType: "particles",
             url: "/GIB-REG",
           },
-        ],
-      },
-      {
-        id: "pde-salinity-ALM",
-        optionName: "Salinidad PdE ALM",
-        optionType: "actionable",
-        variable: "salinity",
-        mapResources: [
           {
-            id: "pde-salinity-alm",
+            id: "pde-currents-gibreg",
             sourceId: "pde",
             resourceType: "heatmap",
-            url: "/ALM-CST",
+            url: "/GIB-REG",
           },
+          // {
+          //   id: "pde-currents-particles-ALM",
+          //   sourceId: "pde",
+          //   resourceType: "particles",
+          //   url: "/ALM-CST",
+          // },
         ],
       },
+      // {
+      //   id: "pde-salinity-ALM",
+      //   optionName: "Salinidad PdE ALM",
+      //   optionType: "actionable",
+      //   variable: "salinity",
+      //   mapResources: [
+      //     {
+      //       id: "pde-salinity-alm",
+      //       sourceId: "pde",
+      //       resourceType: "heatmap",
+      //       url: "/ALM-CST",
+      //     },
+      //   ],
+      // },
       {
         id: "pde-temperature",
         optionName: "Temperatura PdE",

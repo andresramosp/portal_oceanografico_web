@@ -24,18 +24,20 @@ export const useParticlesLayersState = create((set, get) => ({
       let response = await fetch(
         `${API_BASE_URL}/api/particles/generateImage?${queryParams}`
       );
-      let imageUrl = await response.text();
-
-      const image = await WeatherLayers.loadTextureData(imageUrl, false);
+      response = await response.json();
+      const image = await WeatherLayers.loadTextureData(
+        response.imageUrl,
+        false
+      );
       const particleLayer = new WeatherLayers.ParticleLayer({
         id: "particle",
         image,
         bounds: [domain.limW, domain.limS, domain.limE, domain.limN],
         numParticles: 5000,
-        imageUnscale: [-0.186 * 70, 0.27600002 * 70],
+        imageUnscale: [response.minValue * 20, response.maxValue * 20],
         maxAge: 25,
         width: 2,
-        speedFactor: 5,
+        speedFactor: 5.5,
       });
       newLayers.push(particleLayer);
     }

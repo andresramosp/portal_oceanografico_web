@@ -38,9 +38,9 @@ export const useHeatmapLayersState = create(
     setPalette: async () => {
       const { min, max, histogram } = await getPalette(
         get().domains,
-        "2024-03-21T12:00:00.000Z",
-        "2024-03-21T12:00:00.000Z",
-        [get().variable]
+        "2024-05-15T00:00:00.000Z",
+        "2024-05-15T23:00:00.000Z",
+        ["u", "v"]
       );
       get().setPaletteMinMax({ min, max });
       get().setPaletteHistogram(histogram);
@@ -64,7 +64,7 @@ export const useHeatmapLayersState = create(
             domain,
             get().paletteMinMax.min,
             get().paletteMinMax.max,
-            [get().variable]
+            ["u", "v"]
           );
           get().setLatLonStep({ latStep, lonStep });
 
