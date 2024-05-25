@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { getDateRange as getHeatmapDateRange } from "../services/api/heatmap.service";
 import { getDateRange as getTilemapDateRange } from "../services/api/tilemap.service";
-import zukeeper from "zukeeper";
 
 export const usePlayingState = create((set, get) => ({
   domainType: "",
@@ -41,7 +40,7 @@ export const usePlayingState = create((set, get) => ({
     get().setDateFrom(minDate);
     get().setDateTo(maxDate);
 
-    set({ timeIndex: -1 });
+    // set({ timeIndex: -1 });
     get().getTimeIntervalArray();
   },
 
@@ -92,7 +91,7 @@ export const usePlayingState = create((set, get) => ({
     }
 
     set({ timeInterval: result.map((d) => d.toJSON()) });
-    console.log(result.map((d) => d.toJSON()));
+    // console.log(result.map((d) => d.toJSON()));
   },
 }));
 

@@ -19,7 +19,7 @@ export const useParticlesLayersState = create((set, get) => ({
         sourceId: domain.sourceId,
         domainId: domain.id,
         date,
-        variableId: get().variable,
+        variableId: get().variable, // TODO: getVariables()
       });
       let response = await fetch(
         `${API_BASE_URL}/api/particles/generateImage?${queryParams}`
@@ -38,6 +38,10 @@ export const useParticlesLayersState = create((set, get) => ({
         maxAge: 25,
         width: 2,
         speedFactor: 5.5,
+        userData: {
+          option: domain.option,
+          zIndex: 2,
+        },
       });
       newLayers.push(particleLayer);
     }

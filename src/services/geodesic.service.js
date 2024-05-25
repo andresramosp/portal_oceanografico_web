@@ -9,7 +9,7 @@ const getMapViewState = () => {
 const GeodesicService = {
   distanceInPixels(coord1, coord2) {
     const viewState = getMapViewState();
-    console.log("zoom ", viewState.zoom);
+    // console.log("zoom ", viewState.zoom);
     const viewport = new WebMercatorViewport(viewState);
 
     const pixelCoord1 = viewport.project(coord1);
@@ -39,7 +39,7 @@ const GeodesicService = {
 
     // Calculamos la distancia en píxeles entre los dos puntos
     let distance = this.distanceInPixels(nw, anotherPoint);
-    console.log("distance ", distance);
+    // console.log("distance ", distance);
 
     // Calculamos el tamaño de la celda y el radio
     let netcdfPixels =
@@ -50,7 +50,7 @@ const GeodesicService = {
     let radius = cellSizePx * radiusFactor;
     // if (radius < minRadius) radius = minRadius;
 
-    console.log("radius ", radius);
+    // console.log("radius ", radius);
     return radius;
   },
 };

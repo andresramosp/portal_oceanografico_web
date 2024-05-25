@@ -63,7 +63,7 @@ const useMenuState = create((set, get) => ({
             opt.variable != option.variable
         );
       for (let otherOpt of otherHeatmapVarOptions) {
-        console.log("desactivando ", otherOpt.optionName);
+        // console.log("desactivando ", otherOpt.optionName);
         get().setOptionValue(otherOpt.id, false);
       }
     }
@@ -90,6 +90,7 @@ const useMenuState = create((set, get) => ({
   deactivateOption: async (option) => {
     removeHeatmapDomains(option.id);
     removeTilemapDomains(option.id);
+    removeParticlesDomains(option.id);
     removeGeoJSONDomains(option.id);
   },
 

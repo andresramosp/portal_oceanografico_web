@@ -266,7 +266,7 @@ const PaletteService = {
     for (let percent of distribution) {
       let numberColors = Math.floor((percent / 100) * paletteSize);
       if (numberColors < 2) {
-        console.log("COLORS < 2");
+        // console.log("COLORS < 2");
         continue;
       }
       let colors = palette.splice(0, numberColors);
@@ -326,7 +326,7 @@ const PaletteService = {
     } else {
       minThreshold = minThresholdVar;
     }
-    console.log("Color domain: ", minThreshold, maxThreshold);
+    // console.log("Color domain: ", minThreshold, maxThreshold);
     return [minThreshold, maxThreshold];
   },
 };

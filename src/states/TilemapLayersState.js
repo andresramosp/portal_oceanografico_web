@@ -31,6 +31,7 @@ export const useTilemapLayersState = create((set, get) => ({
         tileSize: 256,
         userData: {
           option: domain.option,
+          zIndex: 1,
         },
         renderSubLayers: (props) => {
           const { boundingBox } = props.tile;

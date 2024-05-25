@@ -38,6 +38,7 @@ export const useGeoJSONLayersState = create((set, get) => ({
         getPointRadius: 4,
         userData: {
           option: domain.option,
+          zIndex: 3,
         },
       });
 

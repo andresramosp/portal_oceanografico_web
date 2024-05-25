@@ -10,8 +10,6 @@ export default function DeckGLMap() {
     setViewState(viewState);
   };
 
-  console.log(layers);
-
   return (
     <DeckGL
       initialViewState={viewState}

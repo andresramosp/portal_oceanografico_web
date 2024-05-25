@@ -23,7 +23,6 @@ export const Player = () => {
     timeInterval,
     play,
     setPlayerInterval,
-    dateRange,
     stop,
     hourGap,
   } = usePlayingState();
@@ -55,20 +54,18 @@ export const Player = () => {
 
   const initHeatmapPlayer = async (domains) => {
     setDomainType("heatmap");
-    await Promise.all([setPlayerInterval(domains), setPalette()]);
-    if (!playing) play();
+    await setPlayerInterval(domains);
+    await setPalette();
   };
 
   const initParticlesPlayer = async (domains) => {
-    setDomainType("heatmap"); // De momento lo dejamos como heatmap ya que leerá de los mismos ficheros
-    await Promise.all([setPlayerInterval(domains)]);
-    if (!playing) play();
+    setDomainType("heatmap");
+    await setPlayerInterval(domains);
   };
 
   const initTilemapPlayer = async (domains) => {
     setDomainType("tilemap");
     await setPlayerInterval(domains);
-    if (!playing) play();
   };
 
   const getDateString = (jsonDateStr) => {
@@ -85,27 +82,35 @@ export const Player = () => {
       .replace(",", "");
   };
 
-  useEffect(() => {
+  const handleChangeDomains = async () => {
     if (
       !heatmapDomains.length &&
       !tilemapDomains.length &&
       !particlesDomains.length
     ) {
       stop();
+      setTimeIndex(-1);
       setShowPlayer(false);
+      return;
     }
     if (heatmapDomains.length) {
-      initHeatmapPlayer(heatmapDomains);
-      setShowPlayer(true);
+      await initHeatmapPlayer(heatmapDomains);
     }
     if (tilemapDomains.length) {
-      initTilemapPlayer(tilemapDomains);
-      setShowPlayer(true);
+      await initTilemapPlayer(tilemapDomains);
     }
     if (particlesDomains.length) {
-      initParticlesPlayer(particlesDomains);
-      setShowPlayer(true);
+      await initParticlesPlayer(particlesDomains);
     }
+    setShowPlayer(true);
+    if (!usePlayingState.getState().playing) {
+      console.log("handleChangeDomains, play()");
+      play();
+    }
+  };
+
+  useEffect(() => {
+    handleChangeDomains();
   }, [heatmapDomains, tilemapDomains, particlesDomains]);
 
   useEffect(() => {
@@ -141,7 +146,7 @@ export const Player = () => {
           <span> {getDateString(timeInterval[timeIndex])}</span>
         </div>
 
-        <DatePicker.RangePicker value={dateRange} onChange={handleDateChange} />
+        <DatePicker.RangePicker onChange={handleDateChange} />
       </Space>
     </div>
   ) : null;

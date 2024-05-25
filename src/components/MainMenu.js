@@ -32,13 +32,15 @@ const Option = ({ option }) => {
 
   if (option.optionType === "actionable") {
     return (
-      <Checkbox
-        onChange={() => onChangeOption(option)}
-        value={option.variable}
-        checked={option.checked}
-      >
-        {option.optionName}
-      </Checkbox>
+      <div className="checkbox-option">
+        <Checkbox
+          onChange={() => onChangeOption(option)}
+          value={option.variable}
+          checked={option.checked}
+        >
+          {option.optionName}
+        </Checkbox>
+      </div>
     );
   } else if (option.optionType === "dropdown") {
     return (
