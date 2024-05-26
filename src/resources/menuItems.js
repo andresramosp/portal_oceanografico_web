@@ -3,8 +3,22 @@ export default [
     sectionName: "Oceanografía",
     options: [
       {
-        id: "pde-salinity",
-        optionName: "Salinidad PdE",
+        id: "pde-salinity-GIB",
+        optionName: "Salinidad PdE GIB",
+        optionType: "actionable",
+        variable: "salinity",
+        mapResources: [
+          {
+            id: "pde-salinity-gibreg",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/GIB-REG",
+          },
+        ],
+      },
+      {
+        id: "pde-salinity-ALM",
+        optionName: "Salinidad PdE ALM",
         optionType: "actionable",
         variable: "salinity",
         mapResources: [
@@ -13,12 +27,6 @@ export default [
             sourceId: "pde",
             resourceType: "heatmap",
             url: "/ALM-CST",
-          },
-          {
-            id: "pde-salinity-gibreg",
-            sourceId: "pde",
-            resourceType: "heatmap",
-            url: "/GIB-REG",
           },
         ],
       },
@@ -34,12 +42,12 @@ export default [
             resourceType: "heatmap",
             url: "/GIB-REG",
           },
-          {
-            id: "pde-currents-particles-GIB",
-            sourceId: "pde",
-            resourceType: "particles",
-            url: "/GIB-REG",
-          },
+          // {
+          //   id: "pde-currents-particles-GIB",
+          //   sourceId: "pde",
+          //   resourceType: "particles",
+          //   url: "/GIB-REG",
+          // },
         ],
       },
       {
@@ -56,20 +64,20 @@ export default [
           },
         ],
       },
-      // {
-      //   id: "pde-currents-particles",
-      //   optionName: "Particulas Corrientes PdE",
-      //   optionType: "actionable",
-      //   variable: "currents",
-      //   mapResources: [
-      //     {
-      //       id: "pde-currents-particles-GIB",
-      //       sourceId: "pde",
-      //       resourceType: "particles",
-      //       url: "/GIB-REG",
-      //     },
-      //   ],
-      // },
+      {
+        id: "pde-currents-particles",
+        optionName: "Particulas Corrientes PdE",
+        optionType: "actionable",
+        variable: "currents",
+        mapResources: [
+          {
+            id: "pde-currents-particles-GIB",
+            sourceId: "pde",
+            resourceType: "particles",
+            url: "/GIB-REG",
+          },
+        ],
+      },
       // {
       //   id: "pde-currents-GIB",
       //   optionName: "Corrientes PdE GIB",

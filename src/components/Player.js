@@ -19,6 +19,7 @@ export const Player = () => {
     timeIndex,
     setTimeIndex,
     playing,
+    paused,
     togglePlaying,
     timeInterval,
     play,
@@ -89,7 +90,6 @@ export const Player = () => {
       !particlesDomains.length
     ) {
       stop();
-      setTimeIndex(-1);
       setShowPlayer(false);
       return;
     }
@@ -103,7 +103,7 @@ export const Player = () => {
       await initParticlesPlayer(particlesDomains);
     }
     setShowPlayer(true);
-    if (!usePlayingState.getState().playing) {
+    if (!playing && !paused) {
       console.log("handleChangeDomains, play()");
       play();
     }
@@ -118,7 +118,7 @@ export const Player = () => {
   }, [timeIndex]);
 
   useEffect(() => {
-    if (!playing && heatmapDomains.length) {
+    if (paused && heatmapDomains.length) {
       getLayersForTime(timeIndex);
     }
   }, [viewState.zoom]);
@@ -138,10 +138,10 @@ export const Player = () => {
         <div className="player-info">
           <Button
             type="primary"
-            icon={playing ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+            icon={!paused ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
             onClick={togglePlaying}
           >
-            {playing ? "Pause" : "Play"}
+            {!paused ? "Pause" : "Play"}
           </Button>
           <span> {getDateString(timeInterval[timeIndex])}</span>
         </div>

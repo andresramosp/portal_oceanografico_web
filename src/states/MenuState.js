@@ -71,16 +71,16 @@ const useMenuState = create((set, get) => ({
     let { heatmapDomains, particlesDomains, tilemapDomains, geoJSONDomains } =
       await getDomains(option);
     if (heatmapDomains.length) {
-      addHeatmapDomains(heatmapDomains);
       setHeatmapVariable(option.variable);
+      addHeatmapDomains(heatmapDomains);
     }
     if (particlesDomains.length) {
-      addParticlesDomains(particlesDomains);
       setParticlesVariable(option.variable);
+      addParticlesDomains(particlesDomains);
     }
     if (tilemapDomains.length) {
-      addTilemapDomains(tilemapDomains);
       setTilemapVariable(option.variable);
+      addTilemapDomains(tilemapDomains);
     }
     if (geoJSONDomains.length) {
       addGeoJSONDomains(geoJSONDomains);

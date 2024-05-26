@@ -10,7 +10,8 @@ export const usePlayingState = create((set, get) => ({
   dateFrom: null,
   dateTo: null,
   playing: false,
-  delay: 3000,
+  paused: false,
+  delay: 1500,
   timeInterval: [],
   hourGap: 1,
   animationFrameId: null,
@@ -45,24 +46,32 @@ export const usePlayingState = create((set, get) => ({
   },
 
   togglePlaying: () => {
-    set({ playing: !get().playing });
-    if (get().playing) {
-      get().play();
+    if (!get().paused) {
+      get().pause();
     } else {
-      get().stop();
+      get().play();
     }
   },
 
   play: () => {
     set({ playing: true });
+    set({ paused: false });
     const frameId = requestAnimationFrame(get().forward);
     set({ animationFrameId: frameId });
   },
 
-  stop: () => {
-    get().setPlaying(false);
+  pause: () => {
+    set({ paused: true });
     clearTimeout(get().animationFrameSetTimeoutId);
     cancelAnimationFrame(get().animationFrameId);
+  },
+
+  stop: () => {
+    set({ playing: false });
+    set({ paused: false });
+    clearTimeout(get().animationFrameSetTimeoutId);
+    cancelAnimationFrame(get().animationFrameId);
+    get().setTimeIndex(-1);
   },
 
   forward: () => {

@@ -2,6 +2,9 @@ import { create } from "zustand";
 import * as WeatherLayers from "weatherlayers-gl";
 import { ClipExtension } from "@deck.gl/extensions";
 import useMapState from "./MapState";
+import { usePlayingState } from "./PlayingState";
+import { generateImage } from "../services/api/particles.service";
+import { getVariables } from "../services/variables.service";
 const API_BASE_URL = "http://localhost:8080";
 
 export const useParticlesLayersState = create((set, get) => ({
@@ -15,16 +18,12 @@ export const useParticlesLayersState = create((set, get) => ({
     const mapState = useMapState.getState();
     let newLayers = [];
     for (let domain of get().domains) {
-      const queryParams = new URLSearchParams({
-        sourceId: domain.sourceId,
-        domainId: domain.id,
+      let response = await generateImage(
         date,
-        variableId: get().variable, // TODO: getVariables()
-      });
-      let response = await fetch(
-        `${API_BASE_URL}/api/particles/generateImage?${queryParams}`
+        domain,
+        get().variable,
+        getVariables(get().variable)
       );
-      response = await response.json();
       const image = await WeatherLayers.loadTextureData(
         response.imageUrl,
         false
@@ -48,8 +47,17 @@ export const useParticlesLayersState = create((set, get) => ({
     mapState.addOrUpdateLayers(newLayers);
   },
 
+  refreshLayers: async () => {
+    const { timeInterval, timeIndex } = usePlayingState.getState();
+    let time = timeInterval[timeIndex];
+    get().getLayersForTime(time);
+  },
+
   addDomains: (newDomains) => {
     get().setDomains([...get().domains, ...newDomains]);
+    if (usePlayingState.getState().paused) {
+      get().refreshLayers();
+    }
   },
 
   removeDomains: (optionId) => {
@@ -58,6 +66,9 @@ export const useParticlesLayersState = create((set, get) => ({
       get().setDomains(newDomains);
       const mapState = useMapState.getState();
       mapState.removeLayers(optionId);
+      if (usePlayingState.getState().paused) {
+        get().refreshLayers();
+      }
     }
   },
 }));
