@@ -187,18 +187,34 @@ export default [
             resourceType: "feature",
           },
           {
-            id: "IGEO-coast",
-            optionName: "Costa",
+            id: "IGEO-coast-units",
+            optionName: "Costa - Unidades",
             optionType: "actionable",
             variable: "geological",
             sourceId: "IGEO",
             resourceType: "feature",
             mapResources: [
               {
-                id: "IGEO-coast",
+                id: "IGEO-coast-units",
                 sourceId: "igeo",
                 resourceType: "geojson",
-                url: null,
+                url: "/ANG-GEO-Units",
+              },
+            ],
+          },
+          {
+            id: "IGEO-coast-structures",
+            optionName: "Costa - Estructuras",
+            optionType: "actionable",
+            variable: "geological",
+            sourceId: "IGEO",
+            resourceType: "feature",
+            mapResources: [
+              {
+                id: "IGEO-coast-structures",
+                sourceId: "igeo",
+                resourceType: "geojson",
+                url: "/ANG-GEO-Structures",
               },
             ],
           },

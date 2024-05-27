@@ -13,6 +13,7 @@ export const useGeoJSONLayersState = create((set, get) => ({
     let newLayers = [];
     for (let domain of get().domains) {
       const data = await getLayers(domain);
+      const featureType = data.features[0].geometry.type;
 
       const geoJsonLayer = new GeoJsonLayer({
         id: "GeoJsonLayer",
@@ -25,7 +26,7 @@ export const useGeoJSONLayersState = create((set, get) => ({
             };
           }),
         },
-        stroked: false,
+        stroked: featureType == "MultiLineString",
         filled: true,
         pickable: true,
         getFillColor: (f) => [
@@ -34,8 +35,14 @@ export const useGeoJSONLayersState = create((set, get) => ({
           f.properties.Blue,
           200,
         ],
-        getLineWidth: 20,
+        getLineWidth: (f) => f.linewidth,
         getPointRadius: 4,
+        getLineColor: (f) =>
+          f.properties.CodEstrutu != 510001
+            ? [f.properties.Red, f.properties.Green, f.properties.Blue, 200]
+            : [200, 200, 200, 200],
+        // lineWidthScale: 20,
+        lineWidthMinPixels: 2,
         userData: {
           option: domain.option,
           zIndex: 3,
