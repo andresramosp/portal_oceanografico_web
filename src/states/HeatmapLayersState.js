@@ -67,12 +67,6 @@ export const useHeatmapLayersState = create((set, get) => ({
     const newLayers = [];
     for (let domain of get().domains) {
       try {
-        console.log(
-          "getLayersForTime: leyendo valores min max, ",
-          get().paletteMinMax.min,
-          get().paletteMinMax.max
-        );
-
         const { data, latStep, lonStep } = await getLayerForTime(
           date,
           domain,
@@ -93,10 +87,10 @@ export const useHeatmapLayersState = create((set, get) => ({
             get().latLonStep.latStep,
             get().latLonStep.lonStep,
             {
-              limE: domain.limE,
+              viewE: domain.viewE,
               limS: domain.limS,
-              limN: domain.limN,
-              limW: domain.limW,
+              viewN: domain.viewN,
+              viewW: domain.viewW,
             }
           ),
           intensity: 1,

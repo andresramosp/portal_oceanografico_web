@@ -38,10 +38,10 @@ export const getLayerForTime = async (
       variables,
       bounds: {
         // TODO
-        viewS: null,
-        viewW: null,
-        viewN: null,
-        viewE: null,
+        viewS: domain.viewS,
+        viewW: domain.viewW,
+        viewN: domain.viewN,
+        viewE: domain.viewE,
       },
       zoom: 8, // TODO
     }),

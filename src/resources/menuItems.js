@@ -78,54 +78,6 @@ export default [
           },
         ],
       },
-      // {
-      //   id: "pde-currents-GIB",
-      //   optionName: "Corrientes PdE GIB",
-      //   optionType: "actionable",
-      //   variable: "currents",
-      //   mapResources: [
-      //     // {
-      //     //   id: "pde-currents-particles-GIB",
-      //     //   sourceId: "pde",
-      //     //   resourceType: "particles",
-      //     //   url: "/GIB-REG",
-      //     // },
-      //     {
-      //       id: "pde-currents-gibreg",
-      //       sourceId: "pde",
-      //       resourceType: "heatmap",
-      //       url: "/GIB-REG",
-      //     },
-      //   ],
-      // },
-      // {
-      //   id: "pde-salinity-ALM",
-      //   optionName: "Salinidad PdE ALM",
-      //   optionType: "actionable",
-      //   variable: "salinity",
-      //   mapResources: [
-      //     {
-      //       id: "pde-salinity-alm",
-      //       sourceId: "pde",
-      //       resourceType: "heatmap",
-      //       url: "/ALM-CST",
-      //     },
-      //   ],
-      // },
-      // {
-      //   id: "pde-temperature",
-      //   optionName: "Temperatura PdE",
-      //   optionType: "actionable",
-      //   variable: "temperature",
-      //   mapResources: [
-      //     {
-      //       id: "pde-temperature",
-      //       sourceId: "pde",
-      //       resourceType: "heatmap",
-      //       url: null, // traerá domains por variable y sourceId
-      //     },
-      //   ],
-      // },
       {
         id: "pde-tiles-currents",
         optionName: "Corrientes Tiles PdE",
@@ -140,13 +92,20 @@ export default [
           },
         ],
       },
-      // {
-      //   id: "copernicus-wind",
-      //   optionName: "Viento Copernicus",
-      //   optionType: "actionable",
-      //   variable: "wind",
-      //   resourceType: "heatmap",
-      // },
+      {
+        id: "copernicus-bio",
+        optionName: "Copernicus BIO",
+        optionType: "actionable",
+        variable: "bio",
+        mapResources: [
+          {
+            id: "cop-bio",
+            sourceId: "copernicus",
+            resourceType: "heatmap",
+            url: null,
+          },
+        ],
+      },
       {
         optionName: "Dispositivos Southtek",
         optionType: "dropdown",

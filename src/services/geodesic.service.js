@@ -29,7 +29,7 @@ const GeodesicService = {
     let minRadius = 5.5;
 
     // Punto noroeste de la región cuadrada
-    let nw = [bounds.limW, bounds.limN];
+    let nw = [bounds.viewW, bounds.viewN];
 
     // Calculamos otro punto desplazado según los pasos latitudinales y longitudinales
     let anotherPoint = [

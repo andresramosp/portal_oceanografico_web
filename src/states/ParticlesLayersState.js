@@ -31,7 +31,7 @@ export const useParticlesLayersState = create((set, get) => ({
       const particleLayer = new WeatherLayers.ParticleLayer({
         id: "particle",
         image,
-        bounds: [domain.limW, domain.limS, domain.limE, domain.limN],
+        bounds: [domain.viewW, domain.limS, domain.viewE, domain.viewN],
         numParticles: 5000,
         imageUnscale: [response.minValue * 20, response.maxValue * 20],
         maxAge: 25,
