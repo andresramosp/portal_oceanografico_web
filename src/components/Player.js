@@ -8,6 +8,7 @@ import useMapState from "../states/MapState";
 import { useTilemapLayersState } from "../states/TilemapLayersState";
 import { PlayerLegend } from "./PlayerLegend";
 import { useParticlesLayersState } from "../states/ParticlesLayersState";
+import debounce from "lodash.debounce";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
@@ -118,10 +119,15 @@ export const Player = () => {
   }, [timeIndex]);
 
   useEffect(() => {
-    if (paused && heatmapDomains.length) {
-      getLayersForTime(timeIndex);
-    }
-  }, [viewState.zoom]);
+    const debouncedGetLayers = debounce(() => {
+      if (paused && heatmapDomains.length) {
+        getLayersForTime(timeIndex);
+      }
+    }, 250);
+
+    debouncedGetLayers();
+    return () => debouncedGetLayers.cancel();
+  }, [viewState.zoom, viewState.longitude]);
 
   return showPlayer ? (
     <div className="player-container">

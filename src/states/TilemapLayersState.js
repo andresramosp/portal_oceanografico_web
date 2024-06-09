@@ -19,15 +19,18 @@ export const useTilemapLayersState = create((set, get) => ({
     const mapState = useMapState.getState();
     let newLayers = [];
     for (let domain of get().domains) {
-      let url =
-        `${API_BASE_URL}/api/tilemap/tiles/` +
-        domain.url.replace("{t}", formatDate(date));
+      // let url =
+      //   `${API_BASE_URL}/api/tilemap/tiles/` +
+      //   domain.url.replace("{t}", formatDate(date));
+
       const tileLayer = new TileLayer({
         id: `tilelayer-layer-${domain.id}`,
-        data: url,
-        // maxZoom: domain.zoomMax,
-        // minZoom: domain.zoomMin,
+        data: domain.url,
+        maxZoom: 10,
+        minZoom: 3,
+        opacity: 1,
         maxCacheSize: 20,
+        // zoomOffset: 5,
         tileSize: 256,
         userData: {
           option: domain.option,
@@ -35,6 +38,7 @@ export const useTilemapLayersState = create((set, get) => ({
         },
         renderSubLayers: (props) => {
           const { boundingBox } = props.tile;
+          console.log(boundingBox);
           return new BitmapLayer(props, {
             data: null,
             image: props.data,

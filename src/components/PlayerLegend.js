@@ -9,7 +9,7 @@ export const PlayerLegend = () => {
   useEffect(() => {
     let colorLegendComp = document.querySelector("color-legend");
     colorLegendComp.range = PaletteService.getColorsDistribution(
-      "cirana",
+      "temperature",
       paletteDistribution,
       false
     );

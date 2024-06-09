@@ -3,6 +3,20 @@ export default [
     sectionName: "Oceanografía",
     options: [
       {
+        id: "cop-temp-global",
+        optionName: "Temp Copernicus Glboal",
+        optionType: "actionable",
+        variable: "thetao",
+        mapResources: [
+          {
+            id: "cop-temp-global",
+            sourceId: "copernicus",
+            resourceType: "heatmap",
+            url: null,
+          },
+        ],
+      },
+      {
         id: "pde-salinity-GIB",
         optionName: "Salinidad PdE GIB",
         optionType: "actionable",
@@ -93,16 +107,16 @@ export default [
         ],
       },
       {
-        id: "copernicus-bio",
-        optionName: "Copernicus BIO",
+        id: "cop-tiles-temp",
+        optionName: "Temp. Tiles Cop.",
         optionType: "actionable",
-        variable: "bio",
+        variable: "temp",
         mapResources: [
           {
-            id: "cop-bio",
-            sourceId: "copernicus",
-            resourceType: "heatmap",
-            url: null,
+            id: "cop-tiles-tem",
+            sourceId: "pde",
+            resourceType: "tilemap",
+            url: null, // traerá domains por variable y sourceId
           },
         ],
       },
@@ -125,6 +139,39 @@ export default [
             variable: "clorophile",
             sourceId: "southtek",
             resourceType: "marker",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    sectionName: "BIO",
+    options: [
+      {
+        id: "nasa-bio-0",
+        optionName: "Nasa BIO 0",
+        optionType: "actionable",
+        variable: "bio",
+        mapResources: [
+          {
+            id: "cop-bio-0",
+            sourceId: "nasa",
+            resourceType: "heatmap",
+            url: "/CHELSA-BIO-0",
+          },
+        ],
+      },
+      {
+        id: "nasa-bio-1",
+        optionName: "Nasa BIO 1",
+        optionType: "actionable",
+        variable: "bio",
+        mapResources: [
+          {
+            id: "cop-bio-1",
+            sourceId: "nasa",
+            resourceType: "heatmap",
+            url: "/CHELSA-BIO-1",
           },
         ],
       },

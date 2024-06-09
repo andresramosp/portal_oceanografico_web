@@ -1,3 +1,5 @@
+import GeodesicService from "../geodesic.service";
+
 const API_BASE_URL = "http://localhost:8080";
 
 export const getPalette = async (domains, from, to, variables) => {
@@ -24,6 +26,7 @@ export const getLayerForTime = async (
   maxValue,
   variables
 ) => {
+  console.log(GeodesicService.getViewBounds());
   const response = await fetch(`${API_BASE_URL}/api/heatmap/data`, {
     method: "POST",
     headers: {
@@ -36,13 +39,7 @@ export const getLayerForTime = async (
       minValue,
       maxValue,
       variables,
-      bounds: {
-        // TODO
-        viewS: domain.viewS,
-        viewW: domain.viewW,
-        viewN: domain.viewN,
-        viewE: domain.viewE,
-      },
+      bounds: GeodesicService.getViewBounds(),
       zoom: 8, // TODO
     }),
   });

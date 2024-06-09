@@ -88,14 +88,14 @@ export const useHeatmapLayersState = create((set, get) => ({
             get().latLonStep.lonStep,
             {
               viewE: domain.viewE,
-              limS: domain.limS,
+              viewS: domain.viewS,
               viewN: domain.viewN,
               viewW: domain.viewW,
             }
           ),
           intensity: 1,
           colorRange: PaletteService.getColorsDistribution(
-            "cirana",
+            "temperature",
             get().paletteDistribution,
             true
           ),
