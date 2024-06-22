@@ -5,6 +5,7 @@ import { useHeatmapLayersState } from "./HeatmapLayersState";
 import { useTilemapLayersState } from "./TilemapLayersState";
 import { useGeoJSONLayersState } from "./GeoJSONLayersState";
 import { useParticlesLayersState } from "./ParticlesLayersState";
+import { useMarkerLayersState } from "./MarkerLayersState";
 
 const {
   addDomains: addHeatmapDomains,
@@ -26,6 +27,9 @@ const {
 
 const { addDomains: addGeoJSONDomains, removeDomains: removeGeoJSONDomains } =
   useGeoJSONLayersState.getState();
+
+const { addDomains: addSensorDomains, removeDomains: removeSensorDomains } =
+  useMarkerLayersState.getState();
 
 const useMenuState = create((set, get) => ({
   menuItems,
@@ -68,8 +72,13 @@ const useMenuState = create((set, get) => ({
       }
     }
 
-    let { heatmapDomains, particlesDomains, tilemapDomains, geoJSONDomains } =
-      await getDomains(option);
+    let {
+      heatmapDomains,
+      particlesDomains,
+      tilemapDomains,
+      geoJSONDomains,
+      sensorDomains,
+    } = await getDomains(option);
     if (heatmapDomains.length) {
       setHeatmapVariable(option.variable);
       addHeatmapDomains(heatmapDomains);
@@ -85,6 +94,9 @@ const useMenuState = create((set, get) => ({
     if (geoJSONDomains.length) {
       addGeoJSONDomains(geoJSONDomains);
     }
+    if (sensorDomains.length) {
+      addSensorDomains(sensorDomains);
+    }
   },
 
   deactivateOption: async (option) => {
@@ -92,6 +104,7 @@ const useMenuState = create((set, get) => ({
     removeTilemapDomains(option.id);
     removeParticlesDomains(option.id);
     removeGeoJSONDomains(option.id);
+    removeSensorDomains(option.id);
   },
 
   optionHasType: (option, type) => {

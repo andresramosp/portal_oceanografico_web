@@ -125,20 +125,28 @@ export default [
         optionType: "dropdown",
         options: [
           {
-            id: "southtek-currents",
-            optionName: "Corrientes",
+            id: "boyas-eulerianas",
+            optionName: "Boyas Eulerianas",
             optionType: "actionable",
-            variable: "currents",
-            sourceId: "southtek",
-            resourceType: "marker",
+            mapResources: [
+              {
+                sourceId: "southtek",
+                resourceType: "sensor",
+                url: "/boyas-eulerianas",
+              },
+            ],
           },
           {
-            id: "southtek-clorofila",
-            optionName: "Clorofila",
+            id: "boyas-moviles",
+            optionName: "Boyas Moviles",
             optionType: "actionable",
-            variable: "clorophile",
-            sourceId: "southtek",
-            resourceType: "marker",
+            mapResources: [
+              {
+                sourceId: "southtek",
+                resourceType: "sensor",
+                url: "/boyas-moviles",
+              },
+            ],
           },
         ],
       },

@@ -35,5 +35,6 @@ export const getDomains = async (option) => {
     particlesDomains: result.filter((d) => d.domainType == "particles"),
     tilemapDomains: result.filter((d) => d.domainType == "tilemap"),
     geoJSONDomains: result.filter((d) => d.domainType == "geojson"),
+    sensorDomains: result.filter((d) => d.domainType == "sensor"),
   };
 };
