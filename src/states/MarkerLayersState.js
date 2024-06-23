@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { IconLayer } from "@deck.gl/layers";
 import { getMarkers, getData } from "../services/api/marker.service";
 import useMapState from "./MapState";
 
@@ -12,18 +13,32 @@ export const useMarkerLayersState = create((set, get) => ({
     let newLayers = [];
     for (let domain of get().domains) {
       const data = await getMarkers(domain);
-      const featureType = data.features[0].geometry.type;
 
-      // TODO: crear layers de markers
-      // TODO: añadirle a cada marker su evento para llamar a la API /data
-      // newLayers.push(marker);
+      const iconLayer = new IconLayer({
+        id: "IconLayer-" + domain.id,
+        data,
+        // dataTransform: (result) => result.data,
+        getIcon: (d) => ({
+          url: "/boya.png",
+          width: 128,
+          height: 128,
+        }),
+        getPosition: (d) => [d.longitude, d.latitude],
+        getSize: 35,
+        pickable: true,
+        userData: {
+          option: domain.option,
+          zIndex: 4,
+        },
+      });
+      newLayers.push(iconLayer);
     }
     mapState.addOrUpdateLayers(newLayers);
   },
 
   addDomains: (newDomains) => {
     get().setDomains([...get().domains, ...newDomains]);
-    get().getLayers();
+    get().getMarkers();
   },
 
   removeDomains: (optionId) => {
