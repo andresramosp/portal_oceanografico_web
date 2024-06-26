@@ -17,7 +17,10 @@ export const useMarkerLayersState = create((set, get) => ({
       const iconLayer = new IconLayer({
         id: "IconLayer-" + domain.id,
         data,
-        // dataTransform: (result) => result.data,
+        dataTransform: (result) =>
+          result.map((d) => {
+            return { ...d, tooltip: d.name };
+          }),
         getIcon: (d) => ({
           url: "/boya.png",
           width: 128,

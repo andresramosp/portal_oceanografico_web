@@ -1,0 +1,23 @@
+.custom-tooltip-card {
+  background-color: blue !important;
+  color: white !important;
+  max-width: 300px;
+}
+
+.custom-tooltip-card .ant-card-head {
+  background-color: blue;
+  color: white;
+}
+
+.custom-tooltip-card .ant-card-body {
+  background-color: blue;
+}
+
+/* .ant-table-thead > tr > th {
+  background-color: blue;
+  color: white;
+}
+
+.ant-table-tbody > tr > td {
+  color: white;
+} */
