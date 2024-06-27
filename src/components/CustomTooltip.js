@@ -1,33 +1,32 @@
 import { Card, Table } from "antd";
 import "../styles/customTooltip.css";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import debounce from "lodash.debounce";
 
 const CustomTooltip = ({ data }) => {
-  const [variables, setVariables] = useState([]);
+  const [apiData, setApiData] = useState(null);
+  const debouncedGetDataRef = useRef(null);
 
-  // Fake API call to get variables data
+  const cancelDebounce = () => {
+    if (debouncedGetDataRef.current) {
+      debouncedGetDataRef.current.cancel();
+      debouncedGetDataRef.current = null;
+    }
+  };
+
+  const getApiData = async () => {
+    let result = await data.callback();
+    setApiData(result);
+  };
+
   useEffect(() => {
-    const fetchVariables = () => {
-      // Simula una llamada API para obtener las variables
-      const fakeData = [
-        {
-          name: "Salinidad",
-          value: 35.0,
-          unit: "PSU",
-          lastMeasurementDate: "2024-01-29T11:35:43.912+00:00",
-        },
-        {
-          name: "Temperatura",
-          value: 22.5,
-          unit: "°C",
-          lastMeasurementDate: "2024-01-29T11:35:43.912+00:00",
-        },
-      ];
-      setVariables(fakeData);
-    };
-
-    fetchVariables();
+    cancelDebounce();
+    debouncedGetDataRef.current = debounce(() => {
+      getApiData();
+    }, 450);
+    debouncedGetDataRef.current();
+    return () => debouncedGetDataRef.current.cancel();
   }, []);
 
   const columns = [
@@ -63,7 +62,7 @@ const CustomTooltip = ({ data }) => {
       </p>
       <Table
         columns={columns}
-        dataSource={variables}
+        dataSource={apiData}
         pagination={false}
         rowKey="name"
       />

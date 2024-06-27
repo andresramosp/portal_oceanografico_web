@@ -5,7 +5,6 @@ const useMapState = create((set, get) => ({
   setLayers: (layers) => set({ layers: sortLayers(layers) }),
 
   addOrUpdateLayers: (layers) => {
-    console.log(layers);
     for (let layer of layers) {
       get().removeLayer(layer.props.id);
     }

@@ -11,3 +11,15 @@ export const getMarkers = async (domain) => {
   );
   return response.json();
 };
+
+export const getData = async (domain, sensorId) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/sensor/data/${domain.id}?sourceId=${domain.sourceId}&sensorId=${sensorId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};

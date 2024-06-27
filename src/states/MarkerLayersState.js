@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { IconLayer } from "@deck.gl/layers";
-import { getMarkers, getData } from "../services/api/marker.service";
+import { getMarkers } from "../services/api/marker.service";
 import useMapState from "./MapState";
 
 export const useMarkerLayersState = create((set, get) => ({
@@ -30,6 +30,7 @@ export const useMarkerLayersState = create((set, get) => ({
         getSize: 35,
         pickable: true,
         userData: {
+          domain,
           option: domain.option,
           zIndex: 4,
         },
