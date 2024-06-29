@@ -1,11 +1,12 @@
-import { Card, Table, Descriptions, Badge } from "antd";
+import { Card, Table, Descriptions, Badge, Spin, Skeleton, Button } from "antd";
+import { CloudDownloadOutlined } from "@ant-design/icons";
 import "../styles/customTooltip.css";
-
 import React, { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 
 const CustomTooltip = ({ data }) => {
   const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado para manejar el loading
   const debouncedGetDataRef = useRef(null);
 
   const cancelDebounce = () => {
@@ -16,8 +17,10 @@ const CustomTooltip = ({ data }) => {
   };
 
   const getApiData = async () => {
+    setLoading(true);
     let result = await data.callback();
     setApiData(result);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -68,21 +71,40 @@ const CustomTooltip = ({ data }) => {
         <Descriptions.Item label="Posición">
           {getPositionLabel(data)}
         </Descriptions.Item>
-        <Descriptions.Item label="Última medición">
-          {apiData && new Date(apiData[0].lastMeasurementDate).toLocaleString()}
-        </Descriptions.Item>
         <Descriptions.Item label="Estado">
           {" "}
           <Badge status={getStatus(data)} text={getStatusLabel(data)} />
         </Descriptions.Item>
+        <Descriptions.Item label="Última medición">
+          {apiData ? (
+            new Date(apiData[0].lastMeasurementDate).toLocaleString()
+          ) : (
+            <Skeleton.Input style={{ width: 200 }} active={true} size="small" />
+          )}
+        </Descriptions.Item>
+        <Descriptions.Item label="Datos">
+          {" "}
+          <div style={{ display: "flex", columnGap: 5 }}>
+            <Button type="dashed">Gráficas</Button>
+            <Button type="dashed" icon={<CloudDownloadOutlined />} size={15}>
+              Descargas
+            </Button>
+          </div>
+        </Descriptions.Item>
       </Descriptions>
-      <Table
-        columns={columns}
-        dataSource={apiData}
-        pagination={false}
-        rowKey="name"
-        scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
-      />
+      <div className="table-container">
+        <Spin spinning={loading} tip="Cargando datos...">
+          {!loading && (
+            <Table
+              columns={columns}
+              dataSource={apiData}
+              pagination={false}
+              rowKey="name"
+              scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
+            />
+          )}
+        </Spin>
+      </div>
     </Card>
   );
 };

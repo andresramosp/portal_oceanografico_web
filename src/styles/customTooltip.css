@@ -1,7 +1,8 @@
 .custom-tooltip-card {
   background-color: rgba(0, 123, 255, 0.5) !important;
   color: white !important;
-  max-width: 370px;
+  max-width: 400px;
+  min-height: 250px;
   z-index: 5000;
 }
 
@@ -18,7 +19,7 @@
   background-color: blue;
   color: white;
   min-height: 37px !important;
-  padding: 0 14px !important
+  padding: 0 14px !important;
 }
 
 .custom-tooltip-card .ant-card-body {
@@ -26,6 +27,7 @@
     padding-right: 10px !important;
     padding-bottom: 10px !important;
     padding-top: 5px  !important;
+    min-width: 400px;
 }
 
 .ant-table-thead > tr > th {
@@ -47,4 +49,13 @@
 
 .custom-tooltip-card .ant-badge-status-text {
   color: white !important;
+}
+
+.custom-tooltip-card .table-container {
+  min-height: 100px;
+  display: flex;
+  justify-content: space-evenly;
+  height: 100%;
+  flex-direction: column;
+  flex-wrap: nowrap;
 }
