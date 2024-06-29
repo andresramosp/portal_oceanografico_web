@@ -1,4 +1,4 @@
-import { Card, Table } from "antd";
+import { Card, Table, Descriptions, Badge } from "antd";
 import "../styles/customTooltip.css";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -34,37 +34,54 @@ const CustomTooltip = ({ data }) => {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
+      width: "200px",
     },
     {
       title: "Valor",
       dataIndex: "value",
       key: "value",
-      render: (text, record) => `${text} ${record.unit}`,
-    },
-    {
-      title: "Fecha de Última Medición",
-      dataIndex: "lastMeasurementDate",
-      key: "lastMeasurementDate",
-      render: (text) => new Date(text).toLocaleString(),
+      render: (text, record) => `${text.toFixed(4)} ${record.unit}`,
+      width: "100px",
     },
   ];
 
+  const getPositionLabel = (data) => {
+    const cardinalLat = data.latitude > 0 ? "N" : "S";
+    const cardinalLon = data.longitude > 0 ? "O" : "E";
+    return `Lat ${data.latitude.toFixed(
+      2
+    )}º ${cardinalLat} Lon ${data.longitude.toFixed(2)}º ${cardinalLon}`;
+  };
+
+  const getStatusLabel = (data) => {
+    return data.running ? "Funcionando" : "Parado";
+  };
+
+  const getStatus = (data) => {
+    return data.running ? "processing" : "error";
+  };
+
   return (
     <Card title="Datos de la boya" className="custom-tooltip-card">
-      <p>
-        <strong>Nombre:</strong> {data.name}
-      </p>
-      <p>
-        <strong>Latitud:</strong> {data.latitude}
-      </p>
-      <p>
-        <strong>Longitud:</strong> {data.longitude}
-      </p>
+      <Descriptions column={1} bordered>
+        <Descriptions.Item label="Nombre">{data.name}</Descriptions.Item>
+        <Descriptions.Item label="Posición">
+          {getPositionLabel(data)}
+        </Descriptions.Item>
+        <Descriptions.Item label="Última medición">
+          {apiData && new Date(apiData[0].lastMeasurementDate).toLocaleString()}
+        </Descriptions.Item>
+        <Descriptions.Item label="Estado">
+          {" "}
+          <Badge status={getStatus(data)} text={getStatusLabel(data)} />
+        </Descriptions.Item>
+      </Descriptions>
       <Table
         columns={columns}
         dataSource={apiData}
         pagination={false}
         rowKey="name"
+        scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
       />
     </Card>
   );

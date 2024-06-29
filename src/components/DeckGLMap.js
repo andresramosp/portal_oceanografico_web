@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Map } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
@@ -15,6 +15,10 @@ export default function DeckGLMap() {
     setViewState(viewState);
   };
 
+  const onClick = (info) => {
+    setHoverInfo(null);
+  };
+
   const onHover = (info) => {
     if (info.layer instanceof IconLayer && info.object) {
       let { userData } = info.layer.props;
@@ -25,9 +29,7 @@ export default function DeckGLMap() {
       };
       setHoverInfo(info);
     } else {
-      // Cancelar el debounce si el ratón sale del marker
-      // cancelDebounce();
-      setHoverInfo(null);
+      // setHoverInfo(null);
     }
   };
 
@@ -39,6 +41,7 @@ export default function DeckGLMap() {
         controller={true}
         layers={layers}
         onHover={onHover} // Manejador del evento onHover
+        onClick={onClick}
       >
         <Map
           reuseMaps
@@ -53,7 +56,6 @@ export default function DeckGLMap() {
             position: "absolute",
             left: hoverInfo.x,
             top: hoverInfo.y,
-            pointerEvents: "none",
           }}
         >
           <CustomTooltip data={hoverInfo.object} />
