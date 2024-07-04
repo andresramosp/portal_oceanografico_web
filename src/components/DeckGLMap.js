@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Map } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
@@ -6,21 +6,56 @@ import useMapState from "../states/MapState";
 import CustomTooltip from "./CustomTooltip";
 import { IconLayer } from "@deck.gl/layers";
 import { getData as getMarkerData } from "../services/api/marker.service";
+import debounce from "lodash.debounce";
+import { Drawer } from "antd";
+import SerialTimeGraphics from "./SerialTimeGraphic";
 
 export default function DeckGLMap() {
   const { viewState, mapStyle, setViewState, layers } = useMapState();
   const [hoverInfo, setHoverInfo] = useState(null);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const mapContainerRef = useRef(null);
+  const debouncedMarkerOutRef = useRef(null);
+
+  const [containerRect, setContainerRect] = useState({});
+
+  const cancelDebounce = () => {
+    if (debouncedMarkerOutRef.current) {
+      debouncedMarkerOutRef.current.cancel();
+      debouncedMarkerOutRef.current = null;
+    }
+  };
+
+  const onTooltipMouseEnter = () => {
+    console.log("entra enter");
+  };
+
+  const handleGraphichOpen = () => {
+    setIsDrawerVisible(true);
+    setHoverInfo(null);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerVisible(false);
+  };
+
+  useEffect(() => {
+    if (mapContainerRef.current) {
+      setContainerRect(mapContainerRef.current.getBoundingClientRect());
+    }
+  }, [mapContainerRef]);
 
   const onViewStateChange = ({ viewState }) => {
     setViewState(viewState);
   };
 
   const onClick = (info) => {
-    setHoverInfo(null);
+    // setHoverInfo(null);
   };
 
   const onHover = (info) => {
     if (info.layer instanceof IconLayer && info.object) {
+      cancelDebounce();
       let { userData } = info.layer.props;
 
       info.object = {
@@ -28,19 +63,48 @@ export default function DeckGLMap() {
         callback: () => getMarkerData(userData.domain, info.object.id),
       };
       setHoverInfo(info);
-    } else {
-      // setHoverInfo(null);
+    } else if (hoverInfo) {
+      cancelDebounce();
+      debouncedMarkerOutRef.current = debounce(() => {
+        // setHoverInfo(null);
+      }, 1500);
+      debouncedMarkerOutRef.current();
     }
   };
 
+  const getTooltipPosition = () => {
+    if (!hoverInfo || !containerRect.width) return { left: 0, top: 0 };
+
+    const padding = 10; // Espacio entre el tooltip y el borde del contenedor
+    const tooltipWidth = 400; // Ancho estimado del tooltip
+    const tooltipHeight = 250; // Alto estimado del tooltip
+
+    let left = hoverInfo.x;
+    let top = hoverInfo.y;
+
+    if (hoverInfo.x < padding) {
+      left = padding;
+    }
+    if (hoverInfo.y < padding) {
+      top = padding;
+    }
+
+    return { left, top };
+  };
+
+  const tooltipPosition = getTooltipPosition();
+
   return (
-    <div>
+    <div
+      ref={mapContainerRef}
+      style={{ position: "relative", height: "100vh" }}
+    >
       <DeckGL
         initialViewState={viewState}
         onViewStateChange={onViewStateChange}
         controller={true}
         layers={layers}
-        onHover={onHover} // Manejador del evento onHover
+        onHover={onHover}
         onClick={onClick}
       >
         <Map
@@ -54,13 +118,27 @@ export default function DeckGLMap() {
         <div
           style={{
             position: "absolute",
-            left: hoverInfo.x,
-            top: hoverInfo.y,
+            left: tooltipPosition.left,
+            top: tooltipPosition.top,
+            // pointerEvents: "none", // Para evitar que el tooltip interfiera con otros eventos de mouse
           }}
         >
-          <CustomTooltip data={hoverInfo.object} />
+          <CustomTooltip
+            onHover={onTooltipMouseEnter}
+            onGraphichOpen={handleGraphichOpen}
+            data={hoverInfo.object}
+          />
         </div>
       )}
+      <Drawer
+        title="Serial Time Graphic"
+        placement="bottom"
+        height={400}
+        onClose={handleDrawerClose}
+        visible={isDrawerVisible}
+      >
+        <SerialTimeGraphics />
+      </Drawer>
     </div>
   );
 }

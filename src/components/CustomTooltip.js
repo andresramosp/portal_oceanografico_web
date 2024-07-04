@@ -4,7 +4,7 @@ import "../styles/customTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 
-const CustomTooltip = ({ data }) => {
+const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(true); // Estado para manejar el loading
   const debouncedGetDataRef = useRef(null);
@@ -36,7 +36,7 @@ const CustomTooltip = ({ data }) => {
     {
       title: "Nombre",
       dataIndex: "name",
-      key: "name",
+      key: "name" + Math.random(),
       width: "200px",
     },
     {
@@ -65,47 +65,55 @@ const CustomTooltip = ({ data }) => {
   };
 
   return (
-    <Card title="Datos de la boya" className="custom-tooltip-card">
-      <Descriptions column={1} bordered>
-        <Descriptions.Item label="Nombre">{data.name}</Descriptions.Item>
-        <Descriptions.Item label="Posición">
-          {getPositionLabel(data)}
-        </Descriptions.Item>
-        <Descriptions.Item label="Estado">
-          {" "}
-          <Badge status={getStatus(data)} text={getStatusLabel(data)} />
-        </Descriptions.Item>
-        <Descriptions.Item label="Última medición">
-          {apiData ? (
-            new Date(apiData[0].lastMeasurementDate).toLocaleString()
-          ) : (
-            <Skeleton.Input style={{ width: 200 }} active={true} size="small" />
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label="Datos">
-          {" "}
-          <div style={{ display: "flex", columnGap: 5 }}>
-            <Button type="dashed">Gráficas</Button>
-            <Button type="dashed" icon={<CloudDownloadOutlined />} size={15}>
-              Descargas
-            </Button>
-          </div>
-        </Descriptions.Item>
-      </Descriptions>
-      <div className="table-container">
-        <Spin spinning={loading} tip="Cargando datos...">
-          {!loading && (
-            <Table
-              columns={columns}
-              dataSource={apiData}
-              pagination={false}
-              rowKey="name"
-              scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
-            />
-          )}
-        </Spin>
-      </div>
-    </Card>
+    <div onMouseEnter={onHover}>
+      <Card title="Datos de la boya" className="custom-tooltip-card">
+        <Descriptions column={1} bordered>
+          <Descriptions.Item label="Nombre">{data.name}</Descriptions.Item>
+          <Descriptions.Item label="Posición">
+            {getPositionLabel(data)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Estado">
+            {" "}
+            <Badge status={getStatus(data)} text={getStatusLabel(data)} />
+          </Descriptions.Item>
+          <Descriptions.Item label="Última medición">
+            {apiData ? (
+              new Date(apiData[0].lastMeasurementDate).toLocaleString()
+            ) : (
+              <Skeleton.Input
+                style={{ width: 200 }}
+                active={true}
+                size="small"
+              />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Datos">
+            {" "}
+            <div style={{ display: "flex", columnGap: 5 }}>
+              <Button type="dashed" onClick={onGraphichOpen}>
+                Gráficas
+              </Button>
+              <Button type="dashed" icon={<CloudDownloadOutlined />} size={15}>
+                Descargas
+              </Button>
+            </div>
+          </Descriptions.Item>
+        </Descriptions>
+        <div className="table-container">
+          <Spin spinning={loading} tip="Cargando datos...">
+            {!loading && (
+              <Table
+                columns={columns}
+                dataSource={apiData}
+                pagination={false}
+                rowKey="name"
+                scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
+              />
+            )}
+          </Spin>
+        </div>
+      </Card>
+    </div>
   );
 };
 
