@@ -3,9 +3,8 @@ import { Map } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
 import useMapState from "../states/MapState";
-import CustomTooltip from "./CustomTooltip";
+import SensorDataTooltip from "./SensorDataTooltip";
 import { IconLayer } from "@deck.gl/layers";
-import { getData as getMarkerData } from "../services/api/marker.service";
 import debounce from "lodash.debounce";
 import { Drawer } from "antd";
 import SerialTimeGraphics from "./SerialTimeGraphic";
@@ -13,6 +12,7 @@ import SerialTimeGraphics from "./SerialTimeGraphic";
 export default function DeckGLMap() {
   const { viewState, mapStyle, setViewState, layers } = useMapState();
   const [hoverInfo, setHoverInfo] = useState(null);
+  const [graphicMarker, setGraphicMarker] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const mapContainerRef = useRef(null);
   const debouncedMarkerOutRef = useRef(null);
@@ -32,6 +32,7 @@ export default function DeckGLMap() {
 
   const handleGraphichOpen = () => {
     setIsDrawerVisible(true);
+    setGraphicMarker({ ...hoverInfo.object });
     setHoverInfo(null);
   };
 
@@ -60,7 +61,7 @@ export default function DeckGLMap() {
 
       info.object = {
         ...info.object,
-        callback: () => getMarkerData(userData.domain, info.object.id),
+        ...userData,
       };
       setHoverInfo(info);
     } else if (hoverInfo) {
@@ -123,10 +124,10 @@ export default function DeckGLMap() {
             // pointerEvents: "none", // Para evitar que el tooltip interfiera con otros eventos de mouse
           }}
         >
-          <CustomTooltip
+          <SensorDataTooltip
             onHover={onTooltipMouseEnter}
             onGraphichOpen={handleGraphichOpen}
-            data={hoverInfo.object}
+            marker={hoverInfo.object}
           />
         </div>
       )}
@@ -137,7 +138,7 @@ export default function DeckGLMap() {
         onClose={handleDrawerClose}
         visible={isDrawerVisible}
       >
-        <SerialTimeGraphics />
+        {graphicMarker && <SerialTimeGraphics marker={graphicMarker} />}
       </Drawer>
     </div>
   );

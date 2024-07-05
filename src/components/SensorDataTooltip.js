@@ -1,10 +1,11 @@
 import { Card, Table, Descriptions, Badge, Spin, Skeleton, Button } from "antd";
 import { CloudDownloadOutlined } from "@ant-design/icons";
-import "../styles/customTooltip.css";
+import "../styles/sensorDataTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
+import { getData } from "../services/api/marker.service";
 
-const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
+const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(true); // Estado para manejar el loading
   const debouncedGetDataRef = useRef(null);
@@ -18,7 +19,7 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
 
   const getApiData = async () => {
     setLoading(true);
-    let result = await data.callback();
+    let result = await getData(marker.domain, marker.id);
     setApiData(result);
     setLoading(false);
   };
@@ -35,8 +36,8 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
   const columns = [
     {
       title: "Nombre",
-      dataIndex: "name",
-      key: "name" + Math.random(),
+      dataIndex: "variableName",
+      key: "variableName" + Math.random(),
       width: "200px",
     },
     {
@@ -49,11 +50,11 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
   ];
 
   const getPositionLabel = (data) => {
-    const cardinalLat = data.latitude > 0 ? "N" : "S";
-    const cardinalLon = data.longitude > 0 ? "O" : "E";
-    return `Lat ${data.latitude.toFixed(
+    const cardinalLat = marker.latitude > 0 ? "N" : "S";
+    const cardinalLon = marker.longitude > 0 ? "O" : "E";
+    return `Lat ${marker.latitude.toFixed(
       2
-    )}º ${cardinalLat} Lon ${data.longitude.toFixed(2)}º ${cardinalLon}`;
+    )}º ${cardinalLat} Lon ${marker.longitude.toFixed(2)}º ${cardinalLon}`;
   };
 
   const getStatusLabel = (data) => {
@@ -68,17 +69,17 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
     <div onMouseEnter={onHover}>
       <Card title="Datos de la boya" className="custom-tooltip-card">
         <Descriptions column={1} bordered>
-          <Descriptions.Item label="Nombre">{data.name}</Descriptions.Item>
+          <Descriptions.Item label="Nombre">{marker.name}</Descriptions.Item>
           <Descriptions.Item label="Posición">
-            {getPositionLabel(data)}
+            {getPositionLabel(marker)}
           </Descriptions.Item>
           <Descriptions.Item label="Estado">
             {" "}
-            <Badge status={getStatus(data)} text={getStatusLabel(data)} />
+            <Badge status={getStatus(marker)} text={getStatusLabel(marker)} />
           </Descriptions.Item>
           <Descriptions.Item label="Última medición">
             {apiData ? (
-              new Date(apiData[0].lastMeasurementDate).toLocaleString()
+              new Date(apiData[0].date).toLocaleString()
             ) : (
               <Skeleton.Input
                 style={{ width: 200 }}
@@ -106,7 +107,7 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
                 columns={columns}
                 dataSource={apiData}
                 pagination={false}
-                rowKey="name"
+                rowKey="variableName"
                 scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
               />
             )}
@@ -117,4 +118,4 @@ const CustomTooltip = ({ onHover, onGraphichOpen, data }) => {
   );
 };
 
-export default CustomTooltip;
+export default SensorDataTooltip;

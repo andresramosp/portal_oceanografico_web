@@ -42,11 +42,17 @@ const customizeArgumentAxisLabel = (info) => {
   return info.valueText;
 };
 
-const SerialTimeGraphics = () => {
+const SerialTimeGraphics = ({ marker }) => {
   const [data, setData] = useState(null);
 
   const getData = async () => {
-    const result = await getSerialTimeData();
+    const result = await getSerialTimeData(
+      marker.domain,
+      marker.id,
+      432,
+      "2024-01-23T00:00:00",
+      "2024-01-24T04:00:00"
+    );
     setData(result);
   };
 
@@ -63,10 +69,10 @@ const SerialTimeGraphics = () => {
       onLegendClick={(e) => console.log(e)}
       onZoomEnd={(e) => console.log(e)}
     >
-      <CommonSeriesSettings hoverMode="onlyPoint" argumentField="fecha" />
+      <CommonSeriesSettings hoverMode="onlyPoint" argumentField="date" />
 
       <Series
-        valueField="temperatura"
+        valueField="value"
         name="Temperatura del Agua"
         type="line"
         width={1.5}
