@@ -25,6 +25,7 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
   ]);
   const [initDone, setInitDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const chartRef = useRef(null);
 
   const getVariables = async () => {
     // TODO: API call
@@ -53,6 +54,12 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
 
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
+  };
+
+  const handleZoomOut = () => {
+    if (chartRef.current) {
+      chartRef.current.zoomOut();
+    }
   };
 
   const init = async () => {
@@ -108,8 +115,11 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
             />
           )}
         </Button>
+        <Button type="primary" onClick={handleZoomOut}>
+          Zoom Out
+        </Button>
       </div>
-      <SerialTimeGraphics data={data} />
+      <SerialTimeGraphics ref={chartRef} data={data} />
     </Drawer>
   );
 };

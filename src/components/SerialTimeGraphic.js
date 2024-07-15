@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   Chart,
   Series,
@@ -36,10 +42,21 @@ const getTitle = (data) => {
   return "";
 };
 
-const SerialTimeGraphics = ({ data }) => {
+const SerialTimeGraphics = forwardRef(({ data }, ref) => {
+  const chartRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    zoomOut: () => {
+      if (chartRef.current) {
+        chartRef.current.instance().resetVisualRange();
+      }
+    },
+  }));
+
   return (
     <Chart
       id="chart"
+      ref={chartRef}
       dataSource={data}
       onPointClick={(e) => console.log(e)}
       onPointHoverChanged={(e) => console.log(e)}
@@ -98,6 +115,6 @@ const SerialTimeGraphics = ({ data }) => {
       </Crosshair>
     </Chart>
   );
-};
+});
 
 export default SerialTimeGraphics;
