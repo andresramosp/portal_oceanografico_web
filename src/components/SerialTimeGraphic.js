@@ -32,7 +32,7 @@ const customizeArgumentAxisLabel = (info) => {
 };
 
 const getTitle = (data) => {
-  if (data) return `${data[0].variableName} (${data[0].unit})`;
+  if (data?.length) return `${data[0].variableName} (${data[0].unit})`;
   return "";
 };
 

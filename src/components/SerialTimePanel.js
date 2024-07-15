@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Drawer, Select, DatePicker, Button } from "antd";
+import { Drawer, Select, DatePicker, Button, Spin } from "antd";
 import SerialTimeGraphics from "./SerialTimeGraphic";
 import { getSerialTimeData } from "../services/api/marker.service";
+import dayjs from "dayjs";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -11,12 +13,18 @@ const mockVariables = [
   { variableName: "Velocidad del viento", variableId: 432 },
 ];
 
+const antIcon = <LoadingOutlined style={{ fontSize: 16 }} spin />;
+
 export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
   const [data, setData] = useState(null);
   const variables = useRef([]);
   const [selectedVariableId, setSelectedVariableId] = useState(null);
-  const [dateRange, setDateRange] = useState(null);
+  const [dateRange, setDateRange] = useState([
+    dayjs().subtract(3, "day").startOf("day"),
+    dayjs().startOf("day"),
+  ]);
   const [initDone, setInitDone] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getVariables = async () => {
     // TODO: API call
@@ -24,18 +32,23 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
   };
 
   const getData = async () => {
+    setData(null);
+    setLoading(true);
+    const from = dateRange[0].format("YYYY-MM-DDT00:00:00");
+    const to = dateRange[1].add(1, "day").format("YYYY-MM-DDT00:00:00");
     const result = await getSerialTimeData(
       marker.domain,
       marker.id,
       selectedVariableId,
-      "2024-01-23T00:00:00",
-      "2024-01-23T06:00:00"
+      from,
+      to
     );
     setData(
       result.map((val) => {
         return { ...val, value: parseFloat(val.value.toFixed(4)) };
       })
     );
+    setLoading(false);
   };
 
   const handleDateRangeChange = (dates) => {
@@ -83,10 +96,17 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
 
         <RangePicker
           onChange={handleDateRangeChange}
+          value={dateRange}
           style={{ marginRight: 16 }}
         />
-        <Button type="primary" onClick={getData}>
-          Crear gráfica
+        <Button type="primary" onClick={getData} disabled={loading}>
+          Crear gráfica{" "}
+          {loading && (
+            <Spin
+              indicator={antIcon}
+              style={{ marginLeft: 8, marginBottom: 5 }}
+            />
+          )}
         </Button>
       </div>
       <SerialTimeGraphics data={data} />
