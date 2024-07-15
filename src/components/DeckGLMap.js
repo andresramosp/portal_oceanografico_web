@@ -6,14 +6,13 @@ import useMapState from "../states/MapState";
 import SensorDataTooltip from "./SensorDataTooltip";
 import { IconLayer } from "@deck.gl/layers";
 import debounce from "lodash.debounce";
-import { Drawer } from "antd";
-import SerialTimeGraphics from "./SerialTimeGraphic";
+import { SerialTimePanel } from "./SerialTimePanel";
 
 export default function DeckGLMap() {
   const { viewState, mapStyle, setViewState, layers } = useMapState();
   const [hoverInfo, setHoverInfo] = useState(null);
   const [graphicMarker, setGraphicMarker] = useState(null);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [graphicPanelVisible, setGraphicPanelVisible] = useState(false);
   const mapContainerRef = useRef(null);
   const debouncedMarkerOutRef = useRef(null);
 
@@ -31,13 +30,13 @@ export default function DeckGLMap() {
   };
 
   const handleGraphichOpen = () => {
-    setIsDrawerVisible(true);
+    setGraphicPanelVisible(true);
     setGraphicMarker({ ...hoverInfo.object });
     setHoverInfo(null);
   };
 
   const handleDrawerClose = () => {
-    setIsDrawerVisible(false);
+    setGraphicPanelVisible(false);
   };
 
   useEffect(() => {
@@ -131,15 +130,12 @@ export default function DeckGLMap() {
           />
         </div>
       )}
-      <Drawer
-        title="Serial Time Graphic"
-        placement="bottom"
-        height={400}
-        onClose={handleDrawerClose}
-        visible={isDrawerVisible}
-      >
-        {graphicMarker && <SerialTimeGraphics marker={graphicMarker} />}
-      </Drawer>
+      {graphicPanelVisible && (
+        <SerialTimePanel
+          marker={graphicMarker}
+          handleDrawerClose={handleDrawerClose}
+        />
+      )}
     </div>
   );
 }

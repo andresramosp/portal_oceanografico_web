@@ -9,7 +9,6 @@ import {
   ZoomAndPan,
   Crosshair,
   Size,
-  Aggregation,
   Point,
   CommonSeriesSettings,
   Label,
@@ -17,16 +16,6 @@ import {
   VerticalLine,
 } from "devextreme-react/chart";
 import { getSerialTimeData } from "../services/api/marker.service";
-
-// const aggregationFunction = (aggregationInfo, series) => {
-//   // Define tu función de agregación aquí si es necesario
-//   return {
-//     date: aggregationInfo.intervalStart,
-//     temperature:
-//       aggregationInfo.data.reduce((acc, item) => acc + item.temperature, 0) /
-//       aggregationInfo.data.length,
-//   };
-// };
 
 const customizeTooltip = (info) => {
   return {
@@ -42,24 +31,12 @@ const customizeArgumentAxisLabel = (info) => {
   return info.valueText;
 };
 
-const SerialTimeGraphics = ({ marker }) => {
-  const [data, setData] = useState(null);
+const getTitle = (data) => {
+  if (data) return `${data[0].variableName} (${data[0].unit})`;
+  return "";
+};
 
-  const getData = async () => {
-    const result = await getSerialTimeData(
-      marker.domain,
-      marker.id,
-      432,
-      "2024-01-23T00:00:00",
-      "2024-01-24T04:00:00"
-    );
-    setData(result);
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
+const SerialTimeGraphics = ({ data }) => {
   return (
     <Chart
       id="chart"
@@ -73,16 +50,11 @@ const SerialTimeGraphics = ({ marker }) => {
 
       <Series
         valueField="value"
-        name="Temperatura del Agua"
+        name={getTitle(data)}
         type="line"
         width={1.5}
         hoverStyle={{ width: 1.5 }}
       >
-        {/* <Aggregation
-          method="custom"
-          calculate={aggregationFunction}
-          enabled={true}
-        /> */}
         <Point size={5} hoverStyle={{ size: 3 }} />
       </Series>
 
@@ -95,7 +67,7 @@ const SerialTimeGraphics = ({ marker }) => {
         panKey="shift"
       />
       <Legend
-        visible={true}
+        visible={false}
         orientation="horizontal"
         position="outside"
         itemTextPosition="right"
@@ -111,7 +83,7 @@ const SerialTimeGraphics = ({ marker }) => {
       >
         <Label customizeText={customizeArgumentAxisLabel} />
       </ArgumentAxis>
-      <ValueAxis title="Temperatura (°C)" />
+      <ValueAxis title={getTitle(data)} />
 
       <Tooltip enabled={true} customizeTooltip={customizeTooltip} />
 
