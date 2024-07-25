@@ -4,7 +4,7 @@ import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
 import useMapState from "../states/MapState";
 import SensorDataTooltip from "./SensorDataTooltip";
-import { IconLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, IconLayer } from "@deck.gl/layers";
 import debounce from "lodash.debounce";
 import { SerialTimePanel } from "./SerialTimePanel";
 
@@ -25,8 +25,8 @@ export default function DeckGLMap() {
     }
   };
 
-  const onTooltipMouseEnter = () => {
-    console.log("entra enter");
+  const onTooltipMouseMove = () => {
+    cancelDebounce();
   };
 
   const handleGraphichOpen = () => {
@@ -50,7 +50,7 @@ export default function DeckGLMap() {
   };
 
   const onClick = (info) => {
-    // setHoverInfo(null);
+    setHoverInfo(null);
   };
 
   const onHover = (info) => {
@@ -63,11 +63,12 @@ export default function DeckGLMap() {
         ...userData,
       };
       setHoverInfo(info);
+    } else if (info.layer instanceof GeoJsonLayer) {
     } else if (hoverInfo) {
       cancelDebounce();
       debouncedMarkerOutRef.current = debounce(() => {
-        // setHoverInfo(null);
-      }, 1500);
+        setHoverInfo(null);
+      }, 1000);
       debouncedMarkerOutRef.current();
     }
   };
@@ -106,6 +107,7 @@ export default function DeckGLMap() {
         layers={layers}
         onHover={onHover}
         onClick={onClick}
+        getTooltip={({ object }) => object && object.tooltip}
       >
         <Map
           reuseMaps
@@ -124,7 +126,7 @@ export default function DeckGLMap() {
           }}
         >
           <SensorDataTooltip
-            onHover={onTooltipMouseEnter}
+            onHover={onTooltipMouseMove}
             onGraphichOpen={handleGraphichOpen}
             marker={hoverInfo.object}
           />

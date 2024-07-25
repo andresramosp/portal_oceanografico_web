@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Slider, Button, DatePicker, Space } from "antd";
+import React, { useEffect } from "react";
+import { Space } from "antd";
 import PaletteService from "../services/palette.service";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 

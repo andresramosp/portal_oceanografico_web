@@ -4,6 +4,9 @@ import "../styles/sensorDataTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 import { getData } from "../services/api/marker.service";
+import { componentTheme } from "../themes/blueTheme";
+
+const { Spin: spinTheme } = componentTheme.components;
 
 const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
   const [apiData, setApiData] = useState(null);
@@ -66,8 +69,12 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
   };
 
   return (
-    <div onMouseEnter={onHover}>
-      <Card title="Datos de la boya" className="custom-tooltip-card">
+    <div onMouseMove={onHover}>
+      <Card
+        title="Datos de la boya"
+        className="custom-tooltip-card"
+        bordered={false}
+      >
         <Descriptions column={1} bordered>
           <Descriptions.Item label="Nombre">{marker.name}</Descriptions.Item>
           <Descriptions.Item label="Posición">
@@ -101,7 +108,11 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
           </Descriptions.Item>
         </Descriptions>
         <div className="table-container">
-          <Spin spinning={loading} tip="Cargando datos...">
+          <Spin
+            spinning={loading}
+            tip="Cargando datos..."
+            style={{ color: spinTheme.colorTextBase }}
+          >
             {!loading && (
               <Table
                 columns={columns}

@@ -1,8 +1,11 @@
 import React from "react";
 import { Collapse, Checkbox } from "antd";
 import "antd/dist/reset.css";
-import "../styles/mainMenu.css";
+import "../styles/mainMenu.scss";
 import useMenuState from "../states/MenuState";
+import { componentTheme, customClasses } from "../themes/blueTheme";
+
+const { Collapse: collapseTheme } = componentTheme.components;
 
 const { Panel } = Collapse;
 
@@ -10,7 +13,14 @@ const MainMenu = () => {
   const { menuItems } = useMenuState();
   return (
     <div className="mainMenu-container">
-      <Collapse>
+      <Collapse
+        accordion
+        style={{
+          borderRadius: collapseTheme.borderRadius,
+          fontWeight: "bold",
+          ...customClasses,
+        }}
+      >
         {menuItems.map((section, index) => (
           <Panel header={section.sectionName} key={index}>
             {section.options.map((option, index) => (
@@ -34,6 +44,7 @@ const Option = ({ option }) => {
     return (
       <div className="checkbox-option">
         <Checkbox
+          style={{ color: collapseTheme.colorTextBase, fontWeight: 100 }}
           onChange={() => onChangeOption(option)}
           value={option.variable}
           checked={option.checked}
@@ -44,13 +55,14 @@ const Option = ({ option }) => {
     );
   } else if (option.optionType === "dropdown") {
     return (
-      <Collapse>
-        <Panel header={option.optionName}>
+      <div style={{ color: collapseTheme.colorTextBase }}>
+        <span style={{ fontWeight: "bold" }}>{option.optionName}</span>
+        <div className="sub-panel-list">
           {option.options.map((subOption, index) => (
             <Option key={index} option={subOption} />
           ))}
-        </Panel>
-      </Collapse>
+        </div>
+      </div>
     );
   }
 };

@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Drawer, Select, DatePicker, Button, Spin } from "antd";
+import { Drawer, Select, DatePicker, Button, Spin, Tooltip } from "antd";
+import {
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import SerialTimeGraphics from "./SerialTimeGraphic";
 import { getSerialTimeData } from "../services/api/marker.service";
 import dayjs from "dayjs";
-import { LoadingOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -86,38 +90,51 @@ export const SerialTimePanel = ({ handleDrawerClose, marker }) => {
       visible={true}
       headerStyle={{ display: "none" }}
     >
-      <div style={{ marginBottom: 16 }}>
-        <Select
-          placeholder="Seleccionar variable"
-          style={{ width: 200, marginRight: 16, marginLeft: 35 }}
-          onChange={setSelectedVariableId}
-          value={selectedVariableId}
-          id="variableId"
-        >
-          {variables.current.map((variable) => (
-            <Option key={variable.variableId} value={variable.variableId}>
-              {variable.variableName}
-            </Option>
-          ))}
-        </Select>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ display: "flex", columnGap: 10 }}>
+          <Select
+            placeholder="Seleccionar variable"
+            style={{ width: 200, marginLeft: 35 }}
+            onChange={setSelectedVariableId}
+            value={selectedVariableId}
+            id="variableId"
+          >
+            {variables.current.map((variable) => (
+              <Option key={variable.variableId} value={variable.variableId}>
+                {variable.variableName}
+              </Option>
+            ))}
+          </Select>
 
-        <RangePicker
-          onChange={handleDateRangeChange}
-          value={dateRange}
-          style={{ marginRight: 16 }}
-        />
-        <Button type="primary" onClick={getData} disabled={loading}>
-          Crear gráfica{" "}
-          {loading && (
-            <Spin
-              indicator={antIcon}
-              style={{ marginLeft: 8, marginBottom: 5 }}
+          <RangePicker onChange={handleDateRangeChange} value={dateRange} />
+          <Button type="primary" onClick={getData} disabled={loading}>
+            Crear gráfica{" "}
+            {loading && (
+              <Spin
+                indicator={antIcon}
+                style={{ marginLeft: 8, marginBottom: 5 }}
+              />
+            )}
+          </Button>
+          <Tooltip title="Zoom Out">
+            <Button
+              icon={<FullscreenExitOutlined style={{ fontSize: 22 }} />}
+              onClick={handleZoomOut}
             />
-          )}
-        </Button>
-        <Button type="primary" onClick={handleZoomOut}>
-          Zoom Out
-        </Button>
+          </Tooltip>
+        </div>
+        <img
+          src={`/logos/${marker.domain.sourceId}.png`}
+          width={160}
+          style={{ marginRight: 10 }}
+        />
       </div>
       <SerialTimeGraphics ref={chartRef} data={data} />
     </Drawer>

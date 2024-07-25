@@ -27,7 +27,7 @@ export const useMarkerLayersState = create((set, get) => ({
           height: 128,
         }),
         getPosition: (d) => [d.longitude, d.latitude],
-        getSize: 35,
+        getSize: 27,
         pickable: true,
         userData: {
           domain,

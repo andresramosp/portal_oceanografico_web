@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Slider, Button, DatePicker, Space } from "antd";
-import { PlayCircleOutlined, PauseCircleOutlined } from "@ant-design/icons";
+import { Slider, Button, DatePicker } from "antd";
+import {
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  CalendarOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import "../styles/player.css";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 import { usePlayingState } from "../states/PlayingState";
@@ -9,9 +14,12 @@ import { useTilemapLayersState } from "../states/TilemapLayersState";
 import { PlayerLegend } from "./PlayerLegend";
 import { useParticlesLayersState } from "../states/ParticlesLayersState";
 import debounce from "lodash.debounce";
+import { PlayerOptions } from "./PlayerOptions";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
+  const [showRangePicker, setShowRangePicker] = useState(false);
+  const [showPlayerOptions, setShowPlayerOptions] = useState(false);
 
   const { viewState } = useMapState();
 
@@ -19,6 +27,8 @@ export const Player = () => {
     setDomainType,
     timeIndex,
     setTimeIndex,
+    dateFrom,
+    dateTo,
     playing,
     paused,
     togglePlaying,
@@ -76,6 +86,7 @@ export const Player = () => {
       .toLocaleDateString("es-ES", {
         timeZone: "UTC", // Asegura que la fecha/hora sea en UTC
         day: "2-digit",
+        year: "numeric",
         month: "short",
         hour: "2-digit",
         minute: "2-digit",
@@ -131,29 +142,71 @@ export const Player = () => {
 
   return showPlayer ? (
     <div className="player-container">
-      <PlayerLegend />
-      <Space direction="vertical">
-        <Slider
-          min={0}
-          max={timeInterval.length - 1}
-          step={hourGap}
-          value={timeIndex}
-          onChange={setTimeIndex}
-          style={{ width: "98%" }}
-        />
-        <div className="player-info">
+      <div className="player-main-container" style={{ width: "90%" }}>
+        <div style={{ width: "97%" }}>
+          <div className="legend-container">
+            <PlayerLegend />
+          </div>
+          <div className="controls-container">
+            <Button
+              type="primary"
+              style={{ borderRadius: "50px", width: 30, height: 30 }}
+              icon={
+                !paused ? (
+                  <PauseCircleOutlined style={{ fontSize: 24 }} />
+                ) : (
+                  <PlayCircleOutlined style={{ fontSize: 24 }} />
+                )
+              }
+              onClick={togglePlaying}
+            ></Button>
+            <div style={{ width: "100%" }}>
+              <Slider
+                min={0}
+                max={timeInterval.length - 1}
+                step={hourGap}
+                value={timeIndex}
+                onChange={setTimeIndex}
+                style={{ width: "100%" }}
+                tooltip={{
+                  formatter: (value) => getDateString(timeInterval[timeIndex]),
+                }}
+              />
+              <div className="date-labels-container">
+                <span style={{ color: "white" }}>
+                  {getDateString(dateFrom)}
+                </span>
+                <span style={{ color: "white" }}>{getDateString(dateTo)}</span>
+              </div>
+            </div>
+
+            {showRangePicker && (
+              <DatePicker.RangePicker onChange={handleDateChange} />
+            )}
+          </div>
+        </div>
+        <div className="buttons-container">
           <Button
             type="primary"
-            icon={!paused ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-            onClick={togglePlaying}
-          >
-            {!paused ? "Pause" : "Play"}
-          </Button>
-          <span> {getDateString(timeInterval[timeIndex])}</span>
+            style={{ borderRadius: "50px", width: 27, height: 27 }}
+            icon={<SettingOutlined style={{ fontSize: 17 }} />}
+            onClick={() => setShowPlayerOptions(true)}
+          ></Button>
+          <Button
+            type="text"
+            style={{
+              borderRadius: "50px",
+              width: 27,
+              height: 27,
+              backgroundColor: "white",
+            }}
+            icon={<CalendarOutlined style={{ color: "black", fontSize: 17 }} />}
+          ></Button>
         </div>
-
-        <DatePicker.RangePicker onChange={handleDateChange} />
-      </Space>
+      </div>
+      <div style={{ width: "10%" }}>
+        {showPlayerOptions && <PlayerOptions />}
+      </div>
     </div>
   ) : null;
 };

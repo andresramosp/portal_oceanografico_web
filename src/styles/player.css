@@ -1,33 +1,83 @@
-
 .player-container {
-  background-color: rgba(0, 123, 255, 0.5);
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
   padding: 8px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1;
-  }
+  gap: 10px
+}
 
-  .player-info {
-    display: flex;
-    column-gap: 10px;
-    flex-direction: row;
-    align-content: stretch;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    color: white;
+.player-options-container {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: 14px;
+  padding: 8px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+
+}
+
+.player-main-container {
+  background-color: rgba(0, 0, 0, 0.5);;
+  
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 14px;
+  gap: 17px;
+}
+
+.date-labels-container {
+  margin-top: -7px;
+  padding-left: 5px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.legend-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -5px; /* Espacio entre el PlayerLegend y los controles */
+}
+
+.controls-container {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  flex-direction: column;
+}
+
+.button-text {
+  color: white;
+}
+
+.ant-slider-rail {
+  background-color: whitesmoke !important;
 }
 
 color-legend.styled {
   --cle-font-family: serif;
-  --cle-font-family-title: Impact;
+  --cle-font-family-title: Proxima Nova;
+  --cle-font-size-title: 0.7rem !important;
   --cle-letter-spacing-title: 0.5px;
-  --cle-font-weight: 500;
-  --cle-color: black;
+  --cle-font-weight: 100;
+  --cle-color: white;
   --cle-background: transparent;
   --cle-border-radius: 6px;
-  --cle-padding: 0.15rem 0rem 0rem;
+  --cle-padding: 0rem 0rem 0.4rem 0rem;
   --cle-font-size: 0.7rem !important;
 }
-  
