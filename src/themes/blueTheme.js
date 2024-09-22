@@ -1,3 +1,5 @@
+import { DatePicker } from "antd";
+
 // Configuración global
 export const globalTheme = {
   token: {

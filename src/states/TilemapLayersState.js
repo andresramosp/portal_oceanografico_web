@@ -19,13 +19,13 @@ export const useTilemapLayersState = create((set, get) => ({
     const mapState = useMapState.getState();
     let newLayers = [];
     for (let domain of get().domains) {
-      // let url =
-      //   `${API_BASE_URL}/api/tilemap/tiles/` +
-      //   domain.url.replace("{t}", formatDate(date));
+      let url =
+        `${API_BASE_URL}/api/tilemap/tiles/` +
+        domain.url.replace("{t}", formatDate(date));
 
       const tileLayer = new TileLayer({
         id: `tilelayer-layer-${domain.id}`,
-        data: domain.url,
+        data: url, //domain.url.replace("{t}", formatDate(date)),
         maxZoom: 10,
         minZoom: 3,
         opacity: 1,

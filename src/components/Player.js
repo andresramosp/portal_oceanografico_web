@@ -18,8 +18,8 @@ import { PlayerOptions } from "./PlayerOptions";
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
-  const [showRangePicker, setShowRangePicker] = useState(false);
   const [showPlayerOptions, setShowPlayerOptions] = useState(false);
+  const [isRangePickerOpen, setIsRangePickerOpen] = useState(false);
 
   const { viewState } = useMapState();
 
@@ -29,6 +29,8 @@ export const Player = () => {
     setTimeIndex,
     dateFrom,
     dateTo,
+    minDateFrom,
+    maxDateTo,
     playing,
     paused,
     togglePlaying,
@@ -37,6 +39,7 @@ export const Player = () => {
     setPlayerInterval,
     stop,
     hourGap,
+    setRange,
   } = usePlayingState();
 
   const {
@@ -54,7 +57,8 @@ export const Player = () => {
   } = useParticlesLayersState();
 
   const handleDateChange = (dates) => {
-    // setDateRange(dates);
+    console.log(dates);
+    setRange(dates[0].$d, dates[1].$d);
   };
 
   const getLayersForTime = (timeIndex) => {
@@ -84,7 +88,7 @@ export const Player = () => {
     const date = new Date(jsonDateStr);
     return date
       .toLocaleDateString("es-ES", {
-        timeZone: "UTC", // Asegura que la fecha/hora sea en UTC
+        timeZone: "UTC",
         day: "2-digit",
         year: "numeric",
         month: "short",
@@ -119,6 +123,26 @@ export const Player = () => {
       console.log("handleChangeDomains, play()");
       play();
     }
+  };
+
+  const disabledDate = (current) => {
+    const minDate = minDateFrom ? minDateFrom.startOf("day") : null;
+    const maxDate = maxDateTo ? maxDateTo.endOf("day") : null;
+
+    if (!current) {
+      return false;
+    }
+
+    const currentDate = current.startOf("day");
+
+    if (minDate && currentDate.isBefore(minDate)) {
+      return true;
+    }
+    if (maxDate && currentDate.isAfter(maxDate)) {
+      return true;
+    }
+
+    return false;
   };
 
   useEffect(() => {
@@ -179,10 +203,16 @@ export const Player = () => {
                 <span style={{ color: "white" }}>{getDateString(dateTo)}</span>
               </div>
             </div>
-
-            {showRangePicker && (
-              <DatePicker.RangePicker onChange={handleDateChange} />
-            )}
+            {/* Hidden RangePicker */}
+            <DatePicker.RangePicker
+              value={[dateFrom, dateTo]}
+              onChange={handleDateChange}
+              disabledDate={disabledDate}
+              open={isRangePickerOpen}
+              onOpenChange={(open) => setIsRangePickerOpen(open)}
+              popupClassName="custom-calendar-popup"
+              popupStyle={{ fontSize: "12px" }}
+            />
           </div>
         </div>
         <div className="buttons-container">
@@ -201,6 +231,7 @@ export const Player = () => {
               backgroundColor: "white",
             }}
             icon={<CalendarOutlined style={{ color: "black", fontSize: 17 }} />}
+            onClick={() => setIsRangePickerOpen(true)}
           ></Button>
         </div>
       </div>

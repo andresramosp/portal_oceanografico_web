@@ -31,6 +31,20 @@ export default [
         ],
       },
       {
+        id: "pde-temp-GIB",
+        optionName: "Temperatura PdE GIB",
+        optionType: "actionable",
+        variable: "temperature",
+        mapResources: [
+          {
+            id: "pde-temp-gibreg",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/GIB-REG",
+          },
+        ],
+      },
+      {
         id: "pde-salinity-ALM",
         optionName: "Salinidad PdE ALM",
         optionType: "actionable",
@@ -80,7 +94,7 @@ export default [
       },
       {
         id: "pde-currents-particles",
-        optionName: "Particulas Corrientes PdE",
+        optionName: "Particulas Corrientes GIB",
         optionType: "actionable",
         variable: "currents",
         mapResources: [
@@ -89,6 +103,20 @@ export default [
             sourceId: "pde",
             resourceType: "particles",
             url: "/GIB-REG",
+          },
+        ],
+      },
+      {
+        id: "pde-currents-particles-alm",
+        optionName: "Particulas Corrientes ALM",
+        optionType: "actionable",
+        variable: "currents",
+        mapResources: [
+          {
+            id: "pde-currents-particles-ALM",
+            sourceId: "pde",
+            resourceType: "particles",
+            url: "/ALM-CST",
           },
         ],
       },

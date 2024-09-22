@@ -1,14 +1,21 @@
 import { create } from "zustand";
 import { getDateRange as getHeatmapDateRange } from "../services/api/heatmap.service";
 import { getDateRange as getTilemapDateRange } from "../services/api/tilemap.service";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+// Extender dayjs con los plugins necesarios
+dayjs.extend(utc);
+dayjs.extend(isSameOrBefore);
 
 export const usePlayingState = create((set, get) => ({
   domainType: "",
   timeIndex: -1,
-  minDateFrom: null,
-  maxDateFrom: null,
-  dateFrom: null,
-  dateTo: null,
+  minDateFrom: null, // dayjs o null
+  maxDateTo: null, // dayjs o null
+  dateFrom: null, // dayjs o null
+  dateTo: null, // dayjs o null
   playing: false,
   paused: false,
   delay: 1500,
@@ -20,28 +27,36 @@ export const usePlayingState = create((set, get) => ({
   setDomainType: (domainType) => set({ domainType }),
   setTimeIndex: (timeIndex) => set({ timeIndex }),
   setPlaying: (playing) => set({ playing }),
-  setMinDateFrom: (minDateFrom) => set({ minDateFrom }),
-  setMaxDateFrom: (maxDateFrom) => set({ maxDateFrom }),
-  setDateTo: (dateTo) => set({ dateTo }),
-  setDateFrom: (dateFrom) => set({ dateFrom }),
+  setMinDateFrom: (minDateFrom) =>
+    set({ minDateFrom: minDateFrom ? dayjs(minDateFrom) : null }),
+  setmaxDateTo: (maxDateTo) =>
+    set({ maxDateTo: maxDateTo ? dayjs(maxDateTo) : null }),
+  setDateFrom: (dateFrom) =>
+    set({ dateFrom: dateFrom ? dayjs(dateFrom) : null }),
+  setDateTo: (dateTo) => set({ dateTo: dateTo ? dayjs(dateTo) : null }),
   setHourGap: (hourGap) =>
     set((state) => {
       state.hourGap = hourGap;
     }),
 
   setPlayerInterval: async (domains) => {
-    // Sacamos fecha max y min del conjunto de domimios (para los selects)
+    // Obtenemos las fechas mínimas y máximas del rango de dominios
     const { minDate, maxDate } =
-      get().domainType == "heatmap"
+      get().domainType === "heatmap"
         ? await getHeatmapDateRange(domains)
         : await getTilemapDateRange(domains);
+
+    // Convertimos minDate y maxDate a objetos dayjs
     get().setMinDateFrom(minDate);
-    get().setMaxDateFrom(maxDate);
+    get().setmaxDateTo(maxDate);
+
+    // Establecemos dateFrom y dateTo
     // TODO: Establecemos reproduccion de ultima semana de ese rango
     get().setDateFrom(minDate);
     get().setDateTo(maxDate);
 
-    // set({ timeIndex: -1 });
+    // Reiniciamos timeIndex y generamos el arreglo de intervalos de tiempo
+    get().setTimeIndex(-1);
     get().getTimeIntervalArray();
   },
 
@@ -64,6 +79,13 @@ export const usePlayingState = create((set, get) => ({
     set({ paused: true });
     clearTimeout(get().animationFrameSetTimeoutId);
     cancelAnimationFrame(get().animationFrameId);
+  },
+
+  setRange: (from, to) => {
+    set({ dateFrom: from ? dayjs(from) : null });
+    set({ dateTo: to ? dayjs(to) : null });
+    set({ timeIndex: -1 });
+    get().getTimeIntervalArray();
   },
 
   stop: () => {
@@ -91,17 +113,22 @@ export const usePlayingState = create((set, get) => ({
 
   getTimeIntervalArray: () => {
     let result = [];
-    let currentDate = new Date(get().dateFrom);
-    currentDate.setUTCHours(0, 0, 0, 0);
-    let stopDate = new Date(get().dateTo);
-    while (currentDate <= stopDate) {
-      result.push(new Date(currentDate)); // Crear una nueva instancia de Date
-      currentDate.setHours(currentDate.getHours() + get().hourGap);
+    let currentDate = get().dateFrom
+      ? get().dateFrom.utc().startOf("hour")
+      : null;
+    let stopDate = get().dateTo ? get().dateTo.utc().endOf("hour") : null;
+
+    if (!currentDate || !stopDate) {
+      set({ timeInterval: [] });
+      return;
     }
 
-    set({ timeInterval: result.map((d) => d.toJSON()) });
-    // console.log(result.map((d) => d.toJSON()));
+    while (currentDate.isSameOrBefore(stopDate)) {
+      result.push(currentDate);
+      currentDate = currentDate.add(get().hourGap, "hour");
+    }
+
+    // Convertimos los objetos dayjs a ISO strings
+    set({ timeInterval: result.map((d) => d.toISOString()) });
   },
 }));
-
-// window.store = usePlayingState;

@@ -22,7 +22,7 @@
 }
 
 .player-main-container {
-  background-color: rgba(0, 0, 0, 0.5);;
+  background-color: rgba(0, 0, 0, 0.5);
   
   padding: 8px;
   display: flex;
@@ -80,4 +80,35 @@ color-legend.styled {
   --cle-border-radius: 6px;
   --cle-padding: 0rem 0rem 0.4rem 0rem;
   --cle-font-size: 0.7rem !important;
+}
+
+.ant-picker-range {
+  width: 0px;
+  opacity: 0;
+  z-index: 5000;
+  position: absolute;
+  right: 180px;
+  bottom: 70px;
+}
+
+/* Change the background color of the entire calendar popup */
+/* .custom-calendar-popup .ant-picker-panel {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+} */
+
+/* Optional: Change the header background */
+.custom-calendar-popup .ant-picker-header {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Optional: Change the content background */
+.custom-calendar-popup .ant-picker-body {
+  background-color: rgba(0, 0, 0, 0.5) !important; /* Replace with your desired color */
+  color: white;
+}
+
+.custom-calendar-popup .ant-picker-cell {
+  color: white;
+  padding: 3px
 }

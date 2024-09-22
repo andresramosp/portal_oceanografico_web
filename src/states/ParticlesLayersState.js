@@ -24,25 +24,29 @@ export const useParticlesLayersState = create((set, get) => ({
         get().variable,
         getVariables(get().variable)
       );
-      const image = await WeatherLayers.loadTextureData(
-        response.imageUrl,
-        false
-      );
-      const particleLayer = new WeatherLayers.ParticleLayer({
-        id: "particle",
-        image,
-        bounds: [domain.viewW, domain.viewS, domain.viewE, domain.viewN],
-        numParticles: 5000,
-        imageUnscale: [response.minValue * 20, response.maxValue * 20],
-        maxAge: 25,
-        width: 2,
-        speedFactor: 5.5,
-        userData: {
-          option: domain.option,
-          zIndex: 2,
-        },
-      });
-      newLayers.push(particleLayer);
+      if (response.imageUrl) {
+        const image = await WeatherLayers.loadTextureData(
+          response.imageUrl,
+          false
+        );
+        const particleLayer = new WeatherLayers.ParticleLayer({
+          id: "particle",
+          image,
+          bounds: [domain.viewW, domain.viewS, domain.viewE, domain.viewN],
+          numParticles: 5000,
+          imageUnscale: [response.minValue * 20, response.maxValue * 20],
+          maxAge: 25,
+          width: 2,
+          speedFactor: 5.5,
+          userData: {
+            option: domain.option,
+            zIndex: 2,
+          },
+        });
+        newLayers.push(particleLayer);
+      } else {
+        console.log("No particles for ", date);
+      }
     }
     mapState.addOrUpdateLayers(newLayers);
   },
