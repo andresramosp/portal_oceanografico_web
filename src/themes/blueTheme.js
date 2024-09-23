@@ -33,6 +33,11 @@ export const componentTheme = {
     Spin: {
       colorTextBase: "white",
     },
+    Modal: {
+      // colorBg: "#1890ff",
+      // headerBg: "#005DFF",
+      // colorTextBase: "white",
+    },
   },
 };
 

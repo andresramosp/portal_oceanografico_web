@@ -28,7 +28,7 @@
   display: flex;
   flex-direction: row;
   border-radius: 14px;
-  gap: 17px;
+  gap: 15px;
 }
 
 .date-labels-container {
@@ -82,7 +82,7 @@ color-legend.styled {
   --cle-font-size: 0.7rem !important;
 }
 
-.ant-picker-range {
+.player-container .ant-picker-range {
   width: 0px;
   opacity: 0;
   z-index: 5000;
@@ -91,11 +91,6 @@ color-legend.styled {
   bottom: 70px;
 }
 
-/* Change the background color of the entire calendar popup */
-/* .custom-calendar-popup .ant-picker-panel {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-} */
 
 /* Optional: Change the header background */
 .custom-calendar-popup .ant-picker-header {

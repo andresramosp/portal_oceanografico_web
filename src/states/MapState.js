@@ -2,6 +2,11 @@ import { create } from "zustand";
 
 const useMapState = create((set, get) => ({
   layers: [],
+  downloadDialogVisible: false,
+
+  setDownloadDialogVisible: (visible) =>
+    set({ downloadDialogVisible: visible }),
+
   setLayers: (layers) => set({ layers: sortLayers(layers) }),
 
   addOrUpdateLayers: (layers) => {

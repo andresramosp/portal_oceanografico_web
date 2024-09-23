@@ -5,6 +5,7 @@ import {
   PauseCircleOutlined,
   CalendarOutlined,
   SettingOutlined,
+  CloudDownloadOutlined,
 } from "@ant-design/icons";
 import "../styles/player.css";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
@@ -21,7 +22,7 @@ export const Player = () => {
   const [showPlayerOptions, setShowPlayerOptions] = useState(false);
   const [isRangePickerOpen, setIsRangePickerOpen] = useState(false);
 
-  const { viewState } = useMapState();
+  const { viewState, setDownloadDialogVisible } = useMapState();
 
   const {
     setDomainType,
@@ -167,23 +168,31 @@ export const Player = () => {
   return showPlayer ? (
     <div className="player-container">
       <div className="player-main-container" style={{ width: "90%" }}>
+        <div className="buttons-container">
+          <Button
+            type="primary"
+            style={{ borderRadius: "50px", width: 30, height: 30 }}
+            icon={<CloudDownloadOutlined style={{ fontSize: 24 }} />}
+            onClick={() => setDownloadDialogVisible(true)}
+          ></Button>
+          <Button
+            type="primary"
+            style={{ borderRadius: "50px", width: 30, height: 30 }}
+            icon={
+              !paused ? (
+                <PauseCircleOutlined style={{ fontSize: 24 }} />
+              ) : (
+                <PlayCircleOutlined style={{ fontSize: 24 }} />
+              )
+            }
+            onClick={togglePlaying}
+          ></Button>
+        </div>
         <div style={{ width: "97%" }}>
           <div className="legend-container">
             <PlayerLegend />
           </div>
           <div className="controls-container">
-            <Button
-              type="primary"
-              style={{ borderRadius: "50px", width: 30, height: 30 }}
-              icon={
-                !paused ? (
-                  <PauseCircleOutlined style={{ fontSize: 24 }} />
-                ) : (
-                  <PlayCircleOutlined style={{ fontSize: 24 }} />
-                )
-              }
-              onClick={togglePlaying}
-            ></Button>
             <div style={{ width: "100%" }}>
               <Slider
                 min={0}

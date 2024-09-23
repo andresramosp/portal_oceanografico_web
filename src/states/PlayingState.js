@@ -55,8 +55,7 @@ export const usePlayingState = create((set, get) => ({
     get().setDateFrom(minDate);
     get().setDateTo(maxDate);
 
-    // Reiniciamos timeIndex y generamos el arreglo de intervalos de tiempo
-    get().setTimeIndex(-1);
+    // get().setTimeIndex(-1);
     get().getTimeIntervalArray();
   },
 

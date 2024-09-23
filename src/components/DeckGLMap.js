@@ -4,12 +4,20 @@ import maplibregl from "maplibre-gl";
 import DeckGL from "@deck.gl/react";
 import useMapState from "../states/MapState";
 import SensorDataTooltip from "./SensorDataTooltip";
+import DownloadDialog from "./DownloadDialog";
 import { GeoJsonLayer, IconLayer } from "@deck.gl/layers";
 import debounce from "lodash.debounce";
 import { SerialTimePanel } from "./SerialTimePanel";
 
 export default function DeckGLMap() {
-  const { viewState, mapStyle, setViewState, layers } = useMapState();
+  const {
+    viewState,
+    mapStyle,
+    setViewState,
+    layers,
+    downloadDialogVisible,
+    setDownloadDialogVisible,
+  } = useMapState();
   const [hoverInfo, setHoverInfo] = useState(null);
   const [graphicMarker, setGraphicMarker] = useState(null);
   const [graphicPanelVisible, setGraphicPanelVisible] = useState(false);
@@ -138,6 +146,11 @@ export default function DeckGLMap() {
           handleDrawerClose={handleDrawerClose}
         />
       )}
+      <DownloadDialog
+        visible={downloadDialogVisible}
+        marker={graphicMarker}
+        onCancel={() => setDownloadDialogVisible(false)}
+      />
     </div>
   );
 }
