@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Card, DatePicker, Select, Button, Spin } from "antd";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 import { usePlayingState } from "../states/PlayingState";
 import { downloadHeatmap } from "../services/api/download.service";
 import { componentTheme } from "../themes/blueTheme";
+import dayjs from "dayjs";
+
 
 const { Spin: spinTheme } = componentTheme.components;
 
@@ -11,19 +13,34 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const DownloadDialog = ({ visible, onCancel }) => {
-  const [rangoFechas, setRangoFechas] = useState([]);
+
+  const { dateFrom: playerDateFrom, dateTo: playerDateTo } = usePlayingState();
+
+  const [dateFrom, setDateFrom] = useState();
+  const [dateTo, setDateTo] = useState();
+
+  useEffect(() => {
+    setDateFrom(dayjs(playerDateFrom));
+    setDateTo(dayjs(playerDateTo));
+  }, [playerDateFrom, playerDateTo]);
+  
   const [itemsSeleccionados, setItemsSeleccionados] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { domains } = useHeatmapLayersState();
-  const { dateFrom, dateTo } = usePlayingState();
-
+  
   const domainOptions = domains.map((domain) => {
     return { label: domain.name, value: domain.id };
   });
 
-  const onChangeFecha = (fechas, formatoFechas) => {
-    setRangoFechas(fechas);
+  const onChangeFecha = (dates) => {
+    if (dates) {
+      setDateFrom(dayjs(dates[0])); // Asegúrate de crear un Day.js date object
+      setDateTo(dayjs(dates[1]));    // con el valor seleccionado
+    } else {
+      setDateFrom(null);
+      setDateTo(null);
+    }
   };
 
   const onChangeSelect = (valor) => {

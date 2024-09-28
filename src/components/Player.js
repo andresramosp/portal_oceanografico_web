@@ -58,7 +58,6 @@ export const Player = () => {
   } = useParticlesLayersState();
 
   const handleDateChange = (dates) => {
-    console.log(dates);
     setRange(dates[0].$d, dates[1].$d);
   };
 
