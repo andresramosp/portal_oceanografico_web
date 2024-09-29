@@ -8,6 +8,7 @@ import DownloadDialog from "./DownloadDialog";
 import { GeoJsonLayer, IconLayer } from "@deck.gl/layers";
 import debounce from "lodash.debounce";
 import { SerialTimePanel } from "./SerialTimePanel";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 export default function DeckGLMap() {
   const {
