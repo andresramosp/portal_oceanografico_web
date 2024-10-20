@@ -9,6 +9,7 @@ import { GeoJsonLayer, IconLayer } from "@deck.gl/layers";
 import debounce from "lodash.debounce";
 import { SerialTimePanel } from "./SerialTimePanel";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { useMarkerLayersState } from "../states/MarkerLayersState";
 
 export default function DeckGLMap() {
   const {
@@ -26,6 +27,11 @@ export default function DeckGLMap() {
   const debouncedMarkerOutRef = useRef(null);
 
   const [containerRect, setContainerRect] = useState({});
+
+  // PROVISIONAL: mover a player o similar
+  // const { domains: markerDomains, getMarkersForIndex } = useMarkerLayersState();
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const interval = useRef(null);
 
   const cancelDebounce = () => {
     if (debouncedMarkerOutRef.current) {
@@ -103,6 +109,26 @@ export default function DeckGLMap() {
   };
 
   const tooltipPosition = getTooltipPosition();
+
+  // PROVISIONAL: mover a player o similar
+  // const handleMobileDomains = () => {
+  //   let lagrangnianDomains = markerDomains.filter(
+  //     (d) => d.sensorType == "LAGRANGNIAN"
+  //   );
+  //   if (lagrangnianDomains.length && !interval.current) {
+  //     interval.current = setInterval(() => {
+  //       setCurrentIndex((prevIndex) => (prevIndex + 1) % 5);
+  //     }, 2000); // Cambiar cada 2 segundos
+  //     return () => clearInterval(interval);
+  //   }
+  // };
+  // useEffect(() => {
+  //   handleMobileDomains();
+  // }, [markerDomains]);
+
+  // useEffect(() => {
+  //   getMarkersForIndex(currentIndex);
+  // }, [currentIndex]);
 
   return (
     <div

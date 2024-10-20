@@ -2,47 +2,110 @@ import { create } from "zustand";
 import { IconLayer } from "@deck.gl/layers";
 import { getMarkers } from "../services/api/marker.service";
 import useMapState from "./MapState";
+import * as d3 from "d3-ease";
 
 export const useMarkerLayersState = create((set, get) => ({
   domains: [],
-
   setDomains: (domains) => set({ domains }),
 
-  getMarkers: async () => {
+  mobileLayers: [],
+  setMobileLayers: (mobileLayers) => set({ mobileLayers }),
+
+  getMarkers: async (newDomains) => {
     const mapState = useMapState.getState();
     let newLayers = [];
-    for (let domain of get().domains) {
+    for (let domain of newDomains) {
       const data = await getMarkers(domain);
 
       const iconLayer = new IconLayer({
-        id: "IconLayer-" + domain.id,
+        id: (d) => "IconLayer-" + domain.id + "-" + d.id,
         data,
         dataTransform: (result) =>
           result.map((d) => {
             return { ...d, tooltip: d.name };
           }),
         getIcon: (d) => ({
-          url: "/boya.png",
+          url:
+            domain.sensorType == "LAGRANGNIAN"
+              ? "/boya_lagrangniana.png"
+              : "/boya_euleriana.png",
           width: 128,
           height: 128,
         }),
-        getPosition: (d) => [d.longitude, d.latitude],
+        getPosition: (d) => {
+          return [d.longitude, d.latitude];
+        },
+        // transitions:
+        //   domain.sensorType == "LAGRANGNIAN"
+        //     ? {
+        //         getPosition: {
+        //           duration: 2000,
+        //           easing: (d) => d3.easeCubicInOut(d),
+        //         },
+        //       }
+        //     : undefined,
         getSize: 27,
         pickable: true,
         userData: {
           domain,
           option: domain.option,
           zIndex: 4,
+          sensorType: domain.sensorType,
         },
       });
       newLayers.push(iconLayer);
     }
     mapState.addOrUpdateLayers(newLayers);
+
+    // Los layers mobiles deben recibir actualiciones temporales desde
+    // fuera por lo que los guardamos en un array a fin de poder setear
+    // su posición sin nuevas llamadas a la API
+    let mobileLayers = newLayers.filter(
+      (l) => l.props.userData.sensorType == "LAGRANGNIAN"
+    );
+    get().setMobileLayers([...get().mobileLayers, ...mobileLayers]);
+  },
+
+  getMarkersForIndex: (index) => {
+    const mapState = useMapState.getState();
+    let updatedLayers = [];
+
+    for (let iconLayer of get().mobileLayers) {
+      // Get the existing data from the layer
+      const data = iconLayer.props.data;
+
+      // Update the position for each data point based on the new index
+      const updatedData = data.map((d) => ({
+        ...d,
+        position: d.positions[index],
+      }));
+
+      // Create a new IconLayer with the updated data
+      const updatedIconLayer = new IconLayer({
+        ...iconLayer.props,
+        data: updatedData,
+        id: iconLayer.props.id,
+        transitions: {
+          getPosition: {
+            duration: 2000,
+            easing: (t) => d3.easeCubicInOut(t),
+          },
+        },
+      });
+
+      updatedLayers.push(updatedIconLayer);
+    }
+
+    // Update the layers in the map state
+    mapState.addOrUpdateLayers(updatedLayers);
+
+    // Optionally, update the mobileLayers in the store
+    get().setMobileLayers(updatedLayers);
   },
 
   addDomains: (newDomains) => {
     get().setDomains([...get().domains, ...newDomains]);
-    get().getMarkers();
+    get().getMarkers(newDomains);
   },
 
   removeDomains: (optionId) => {
@@ -52,5 +115,11 @@ export const useMarkerLayersState = create((set, get) => ({
       const mapState = useMapState.getState();
       mapState.removeLayers(optionId);
     }
+    // Remove corresponding mobile layers
+
+    // const newMobileLayers = get().mobileLayers.filter(
+    //   (layer) => layer.props.userData.option.id !== optionId
+    // );
+    // get().setMobileLayers(newMobileLayers);
   },
 }));

@@ -11,7 +11,7 @@ const useMapState = create((set, get) => ({
 
   addOrUpdateLayers: (layers) => {
     for (let layer of layers) {
-      get().removeLayer(layer.props.id);
+      get().removeLayer(layer.props.id); // TODO: ver si sobra por el update de deck.gl por ids
     }
     set({ layers: sortLayers([...get().layers, ...layers]) });
   },

@@ -61,11 +61,11 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
   };
 
   const getStatusLabel = (data) => {
-    return data.running ? "Funcionando" : "Parado";
+    return data.status == 0 ? "Funcionando" : "Parado";
   };
 
   const getStatus = (data) => {
-    return data.running ? "processing" : "error";
+    return data.status == 0 ? "processing" : "error";
   };
 
   return (

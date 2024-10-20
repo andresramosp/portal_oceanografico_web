@@ -166,13 +166,13 @@ export default [
           },
           {
             id: "boyas-moviles",
-            optionName: "Boyas Moviles",
+            optionName: "Boyas Lagragnianas",
             optionType: "actionable",
             mapResources: [
               {
                 sourceId: "southtek",
                 resourceType: "sensor",
-                url: "/boyas-moviles",
+                url: "/boyas-lagragnianas",
               },
             ],
           },
