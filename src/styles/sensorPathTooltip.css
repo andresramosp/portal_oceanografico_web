@@ -1,29 +1,29 @@
-.custom-tooltip-card {
+.custom-tooltip-path-card {
   background-color: rgba(0, 123, 255, 0.7) !important;
   color: white !important;
-  max-width: 400px;
-  min-height: 250px;
+  /* max-width: 300px; */
+  min-height: 100px;
   z-index: 5000;
 }
 
-.custom-tooltip-card .ant-descriptions-item-label,
-.custom-tooltip-card .ant-descriptions-item-content {
+.tooltip- .custom-tooltip-path-card .ant-descriptions-item-label,
+.custom-tooltip-path-card .ant-descriptions-item-content {
   color: white !important;
   padding: 5px !important;
 }
 
-.custom-tooltip-card .ant-descriptions {
+.custom-tooltip-path-card .ant-descriptions {
   padding-bottom: 7px;
 }
 
-.custom-tooltip-card .ant-card-head {
+.custom-tooltip-path-card .ant-card-head {
   background-color: blue;
   color: white;
   min-height: 37px !important;
   padding: 0 14px !important;
 }
 
-.custom-tooltip-card .ant-card-body {
+.custom-tooltip-path-card .ant-card-body {
   padding-left: 10px !important;
   padding-right: 10px !important;
   padding-bottom: 10px !important;
@@ -37,21 +37,21 @@
 .ant-table-tbody > tr > td {
 }
 
-.custom-tooltip-card .ant-table-cell {
+.custom-tooltip-path-card .ant-table-cell {
   padding: 5px !important;
   font-size: 13px;
 }
 
-.custom-tooltip-card .ant-table {
+.custom-tooltip-path-card .ant-table {
   border-radius: 0px;
   padding: 7px !important;
 }
 
-.custom-tooltip-card .ant-badge-status-text {
+.custom-tooltip-path-card .ant-badge-status-text {
   color: white !important;
 }
 
-.custom-tooltip-card .table-container {
+.custom-tooltip-path-card .table-container {
   min-height: 100px;
   display: flex;
   justify-content: space-evenly;

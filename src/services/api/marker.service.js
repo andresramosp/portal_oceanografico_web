@@ -24,6 +24,18 @@ export const getData = async (domain, sensorId) => {
   return response.json();
 };
 
+export const getPathData = async (domain, sensorId) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/sensor/pathdata/${domain.id}?sourceId=${domain.sourceId}&sensorId=${sensorId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
 export const getSerialTimeData = async (
   domain,
   sensorId,

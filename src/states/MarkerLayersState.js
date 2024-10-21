@@ -8,9 +8,6 @@ export const useMarkerLayersState = create((set, get) => ({
   domains: [],
   setDomains: (domains) => set({ domains }),
 
-  mobileLayers: [],
-  setMobileLayers: (mobileLayers) => set({ mobileLayers }),
-
   getMarkers: async (newDomains) => {
     const mapState = useMapState.getState();
     let newLayers = [];
@@ -56,16 +53,16 @@ export const useMarkerLayersState = create((set, get) => ({
       newLayers.push(iconLayer);
     }
     mapState.addOrUpdateLayers(newLayers);
-
-    // Los layers mobiles deben recibir actualiciones temporales desde
-    // fuera por lo que los guardamos en un array a fin de poder setear
-    // su posición sin nuevas llamadas a la API
-    let mobileLayers = newLayers.filter(
-      (l) => l.props.userData.sensorType == "LAGRANGNIAN"
-    );
-    get().setMobileLayers([...get().mobileLayers, ...mobileLayers]);
   },
 
+  updateMarkerForPosition: (markerId, position) => {
+    // TODO: para ser llamado con el slider-mini-player para una sola boya
+    // TODO: hay que pensar como se gestiona esto para un solo marker, ya que hasta ahora hemos tratado layers con varios markers
+    // Quiza solo iterar como antes, pero filtrando por el id, y actualizarle la position... (SI)
+    // TODO: tener en cuenta requisito de dejar visible position final, por lo que quizas seria mejor añadir un nuevo marker para la animacion?
+  },
+
+  // Usar para crear el metodo de arriba y borrar
   getMarkersForIndex: (index) => {
     const mapState = useMapState.getState();
     let updatedLayers = [];
