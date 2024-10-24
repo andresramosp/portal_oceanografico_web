@@ -1,40 +1,119 @@
-import { Card, Table, Descriptions, Badge, Spin, Skeleton, Button } from "antd";
-import { CloudDownloadOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Table,
+  Descriptions,
+  Badge,
+  Spin,
+  Skeleton,
+  Button,
+  Slider,
+} from "antd";
+import { CloseOutlined, CloudDownloadOutlined } from "@ant-design/icons";
 import "../styles/sensorDataTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
-import debounce from "lodash.debounce";
-import { getData } from "../services/api/marker.service";
+import { getData, getPathData } from "../services/api/marker.service";
+import { useMarkerLayersState } from "../states/MarkerLayersState";
 import { componentTheme } from "../themes/blueTheme";
 
 const { Spin: spinTheme } = componentTheme.components;
 
-const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
+const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const [apiData, setApiData] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado para manejar el loading
-  const debouncedGetDataRef = useRef(null);
+  const [loadingData, setLoadingData] = useState(false);
 
-  const cancelDebounce = () => {
-    if (debouncedGetDataRef.current) {
-      debouncedGetDataRef.current.cancel();
-      debouncedGetDataRef.current = null;
-    }
-  };
+  const [pathApiData, setPathApiData] = useState([]);
+  const [timeIndex, setTimeIndex] = useState(-1);
+  const [loadingPath, setLoadingPath] = useState(false);
+  const [positionLabel, setPositionLabel] = useState(null);
+
+  const { updateMarkerForPosition } = useMarkerLayersState.getState();
 
   const getApiData = async () => {
-    setLoading(true);
+    setLoadingData(true);
     let result = await getData(marker.domain, marker.id);
     setApiData(result);
-    setLoading(false);
+    setLoadingData(false);
+  };
+
+  const getApiPathData = async () => {
+    setLoadingPath(true);
+    let result = await getPathData(marker.domain, marker.id);
+    setPathApiData(result);
+    setTimeIndex(result.length - 1);
+    setLoadingPath(false);
   };
 
   useEffect(() => {
-    cancelDebounce();
-    debouncedGetDataRef.current = debounce(() => {
+    setApiData(null);
+    setPathApiData([]);
+    console.log("entra useEffect");
+    if (marker.sensorType !== "LAGRANGNIAN") {
       getApiData();
-    }, 450);
-    debouncedGetDataRef.current();
-    return () => debouncedGetDataRef.current.cancel();
-  }, []);
+    }
+    if (marker.sensorType === "LAGRANGNIAN") {
+      getApiPathData();
+    }
+  }, [marker]);
+
+  useEffect(() => {
+    if (timeIndex !== -1 && marker.sensorType === "LAGRANGNIAN") {
+      updateMarkerForPosition(marker.id, timeIndex);
+      let position = pathApiData[timeIndex];
+      setPositionLabel(
+        getDateString(position.positionDateTime) +
+          " | " +
+          getLatLngLabel(position)
+      );
+    }
+  }, [timeIndex]);
+
+  const getDateString = (jsonDateStr) => {
+    const date = new Date(jsonDateStr);
+    return date
+      .toLocaleDateString("es-ES", {
+        timeZone: "UTC",
+        day: "2-digit",
+        year: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "");
+  };
+
+  const getLatLngLabel = (position) => {
+    const cardinalLat = position.latitude > 0 ? "N" : "S";
+    const cardinalLon = position.longitude > 0 ? "O" : "E";
+    return `Lat ${position.latitude.toFixed(
+      2
+    )}º ${cardinalLat} Lon ${position.longitude.toFixed(2)}º ${cardinalLon}`;
+  };
+
+  const getPositionLabel = () => {
+    if (
+      marker.sensorType === "LAGRANGNIAN" &&
+      pathApiData.length > 0 &&
+      timeIndex !== -1
+    ) {
+      const position = pathApiData[timeIndex];
+      return getLatLngLabel(position);
+    } else {
+      const cardinalLat = marker.latitude > 0 ? "N" : "S";
+      const cardinalLon = marker.longitude > 0 ? "O" : "E";
+      return `Lat ${marker.latitude.toFixed(
+        2
+      )}º ${cardinalLat} Lon ${marker.longitude.toFixed(2)}º ${cardinalLon}`;
+    }
+  };
+
+  const getStatusLabel = (data) => {
+    return data.status == 0 ? "Funcionando" : "Parado";
+  };
+
+  const getStatus = (data) => {
+    return data.status == 0 ? "processing" : "error";
+  };
 
   const columns = [
     {
@@ -52,33 +131,24 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
     },
   ];
 
-  const getPositionLabel = (data) => {
-    const cardinalLat = marker.latitude > 0 ? "N" : "S";
-    const cardinalLon = marker.longitude > 0 ? "O" : "E";
-    return `Lat ${marker.latitude.toFixed(
-      2
-    )}º ${cardinalLat} Lon ${marker.longitude.toFixed(2)}º ${cardinalLon}`;
-  };
-
-  const getStatusLabel = (data) => {
-    return data.status == 0 ? "Funcionando" : "Parado";
-  };
-
-  const getStatus = (data) => {
-    return data.status == 0 ? "processing" : "error";
-  };
-
   return (
     <div onMouseMove={onHover}>
       <Card
         title="Datos de la boya"
         className="custom-tooltip-card"
         bordered={false}
+        extra={
+          <Button
+            type="text"
+            onClick={onClose}
+            icon={<CloseOutlined style={{ color: "white" }} />}
+          />
+        }
       >
         <Descriptions column={1} bordered>
           <Descriptions.Item label="Nombre">{marker.name}</Descriptions.Item>
           <Descriptions.Item label="Posición">
-            {getPositionLabel(marker)}
+            {getPositionLabel()}
           </Descriptions.Item>
           <Descriptions.Item label="Estado">
             {" "}
@@ -107,19 +177,41 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker }) => {
             </div>
           </Descriptions.Item>
         </Descriptions>
+        {marker.sensorType === "LAGRANGNIAN" && (
+          <div className="slider-container">
+            <Spin
+              spinning={loadingPath}
+              tip="Cargando datos..."
+              style={{ color: spinTheme.colorTextBase }}
+            >
+              {!loadingPath && (
+                <>
+                  <Slider
+                    min={0}
+                    max={pathApiData.length - 1}
+                    step={1}
+                    value={timeIndex}
+                    onChange={setTimeIndex}
+                  />
+                  {positionLabel}
+                </>
+              )}
+            </Spin>
+          </div>
+        )}
         <div className="table-container">
           <Spin
-            spinning={loading}
+            spinning={loadingData}
             tip="Cargando datos..."
             style={{ color: spinTheme.colorTextBase }}
           >
-            {!loading && (
+            {!loadingData && (
               <Table
                 columns={columns}
                 dataSource={apiData}
                 pagination={false}
                 rowKey="variableName"
-                scroll={{ y: 240 }} // Ajusta el valor de `y` según el alto máximo que necesites
+                scroll={{ y: 240 }}
               />
             )}
           </Spin>

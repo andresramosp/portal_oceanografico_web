@@ -3,7 +3,7 @@
   color: white !important;
   max-width: 400px;
   min-height: 250px;
-  z-index: 5000;
+  z-index: 1000;
 }
 
 .custom-tooltip-card .ant-descriptions-item-label,
@@ -16,11 +16,15 @@
   padding-bottom: 7px;
 }
 
+.custom-tooltip-card .ant-card-head-title {
+  padding-left: 15px;
+}
+
 .custom-tooltip-card .ant-card-head {
   background-color: blue;
   color: white;
   min-height: 37px !important;
-  padding: 0 14px !important;
+  padding: 0px !important;
 }
 
 .custom-tooltip-card .ant-card-body {
@@ -53,6 +57,15 @@
 
 .custom-tooltip-card .table-container {
   min-height: 100px;
+  display: flex;
+  justify-content: space-evenly;
+  height: 100%;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.custom-tooltip-card .slider-container {
+  min-height: 50px;
   display: flex;
   justify-content: space-evenly;
   height: 100%;
