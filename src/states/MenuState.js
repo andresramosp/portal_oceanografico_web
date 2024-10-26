@@ -58,6 +58,8 @@ const useMenuState = create((set, get) => ({
   activateOption: async (option) => {
     // TODO: en realidad solo hay que desactivar si estoy poniendo un heatmap, las options heatmaps de otras vars
     // ver como saber si una option es heatmap (o mirar alguno de sus resources con una funcion isHeatMapOption...)
+    // TODO: también habrá que comprobar que el hourGap sea el mismo, aunque esto está a nivel de dominio, no de option. Se podría
+    // elevar a option ya que nunca podrán visualizarse dos dominios con diferente hourGap.
     if (get().optionHasType(option, "heatmap")) {
       let otherHeatmapVarOptions = get()
         .getActiveOptions()

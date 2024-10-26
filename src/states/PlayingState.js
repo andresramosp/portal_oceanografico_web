@@ -27,6 +27,8 @@ export const usePlayingState = create((set, get) => ({
   setDomainType: (domainType) => set({ domainType }),
   setTimeIndex: (timeIndex) => set({ timeIndex }),
   setPlaying: (playing) => set({ playing }),
+  setPaused: (paused) => set({ paused }),
+
   setMinDateFrom: (minDateFrom) =>
     set({ minDateFrom: minDateFrom ? dayjs(minDateFrom) : null }),
   setmaxDateTo: (maxDateTo) =>
@@ -34,10 +36,7 @@ export const usePlayingState = create((set, get) => ({
   setDateFrom: (dateFrom) =>
     set({ dateFrom: dateFrom ? dayjs(dateFrom) : null }),
   setDateTo: (dateTo) => set({ dateTo: dateTo ? dayjs(dateTo) : null }),
-  setHourGap: (hourGap) =>
-    set((state) => {
-      state.hourGap = hourGap;
-    }),
+  setHourGap: (hourGap) => set({ hourGap }),
 
   setPlayerInterval: async (domains) => {
     // Obtenemos las fechas mínimas y máximas del rango de dominios

@@ -16,6 +16,9 @@ import { PlayerLegend } from "./PlayerLegend";
 import { useParticlesLayersState } from "../states/ParticlesLayersState";
 import debounce from "lodash.debounce";
 import { PlayerOptions } from "./PlayerOptions";
+import { componentTheme } from "../themes/blueTheme";
+
+const { Player: playerTheme } = componentTheme.components;
 
 export const Player = () => {
   const [showPlayer, setShowPlayer] = useState(false);
@@ -34,12 +37,14 @@ export const Player = () => {
     maxDateTo,
     playing,
     paused,
+    setPaused,
     togglePlaying,
     timeInterval,
     play,
     setPlayerInterval,
     stop,
     hourGap,
+    setHourGap,
     setRange,
   } = usePlayingState();
 
@@ -70,17 +75,20 @@ export const Player = () => {
 
   const initHeatmapPlayer = async (domains) => {
     setDomainType("heatmap");
-    await setPlayerInterval(domains);
+    setHourGap(domains[0].hourGap);
+    if (domains[0].hourGap) await setPlayerInterval(domains);
     await setPalette();
   };
 
   const initParticlesPlayer = async (domains) => {
     setDomainType("heatmap");
+    setHourGap(domains[0].hourGap);
     await setPlayerInterval(domains);
   };
 
   const initTilemapPlayer = async (domains) => {
     setDomainType("tilemap");
+    setHourGap(domains[0].hourGap);
     await setPlayerInterval(domains);
   };
 
@@ -109,17 +117,25 @@ export const Player = () => {
       setShowPlayer(false);
       return;
     }
+    let hourGap;
     if (heatmapDomains.length) {
       await initHeatmapPlayer(heatmapDomains);
+      hourGap = heatmapDomains[0].hourGap;
     }
     if (tilemapDomains.length) {
       await initTilemapPlayer(tilemapDomains);
+      hourGap = tilemapDomains[0].hourGap;
     }
     if (particlesDomains.length) {
       await initParticlesPlayer(particlesDomains);
+      hourGap = particlesDomains[0].hourGap;
     }
     setShowPlayer(true);
-    if (!playing && !paused) {
+
+    if (hourGap == 0) {
+      setTimeIndex(0);
+      setPaused(true);
+    } else if (!playing && !paused) {
       console.log("handleChangeDomains, play()");
       play();
     }
@@ -166,7 +182,10 @@ export const Player = () => {
 
   return showPlayer ? (
     <div className="player-container">
-      <div className="player-main-container" style={{ width: "90%" }}>
+      <div
+        className="player-main-container"
+        style={{ width: hourGap !== 0 ? "75%" : "25%" }}
+      >
         <div className="buttons-container">
           <Button
             type="primary"
@@ -174,77 +193,107 @@ export const Player = () => {
             icon={<CloudDownloadOutlined style={{ fontSize: 24 }} />}
             onClick={() => setDownloadDialogVisible(true)}
           ></Button>
-          <Button
-            type="primary"
-            style={{ borderRadius: "50px", width: 30, height: 30 }}
-            icon={
-              !paused ? (
-                <PauseCircleOutlined style={{ fontSize: 24 }} />
-              ) : (
-                <PlayCircleOutlined style={{ fontSize: 24 }} />
-              )
-            }
-            onClick={togglePlaying}
-          ></Button>
+          {hourGap !== 0 && (
+            <Button
+              type="primary"
+              style={{ borderRadius: "50px", width: 30, height: 30 }}
+              icon={
+                !paused ? (
+                  <PauseCircleOutlined style={{ fontSize: 24 }} />
+                ) : (
+                  <PlayCircleOutlined style={{ fontSize: 24 }} />
+                )
+              }
+              onClick={togglePlaying}
+            ></Button>
+          )}
         </div>
         <div style={{ width: "97%" }}>
           <div className="legend-container">
             <PlayerLegend />
           </div>
-          <div className="controls-container">
-            <div style={{ width: "100%" }}>
-              <Slider
-                min={0}
-                max={timeInterval.length - 1}
-                step={hourGap}
-                value={timeIndex}
-                onChange={setTimeIndex}
-                style={{ width: "100%" }}
-                tooltip={{
-                  formatter: (value) => getDateString(timeInterval[timeIndex]),
-                }}
-              />
-              <div className="date-labels-container">
-                <span style={{ color: "white" }}>
-                  {getDateString(dateFrom)}
-                </span>
-                <span style={{ color: "white" }}>{getDateString(dateTo)}</span>
+          {hourGap !== 0 && (
+            <div className="controls-container">
+              <div style={{ width: "100%" }}>
+                <Slider
+                  min={0}
+                  max={timeInterval.length - 1}
+                  step={hourGap}
+                  value={timeIndex}
+                  onChange={setTimeIndex}
+                  style={{ width: "100%" }}
+                  tooltip={{
+                    formatter: (value) =>
+                      getDateString(timeInterval[timeIndex]),
+                  }}
+                />
+                <div className="date-labels-container">
+                  <span
+                    style={{
+                      color: playerTheme.colorTextBase,
+                      fontSize: "12px",
+                    }}
+                  >
+                    {getDateString(dateFrom)}
+                  </span>
+                  <span
+                    style={{
+                      color: playerTheme.colorTextBase,
+                      textAlign: "center",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {getDateString(timeInterval[timeIndex])}
+                  </span>
+                  <span
+                    style={{
+                      color: playerTheme.colorTextBase,
+                      fontSize: "12px",
+                    }}
+                  >
+                    {getDateString(dateTo)}
+                  </span>
+                </div>
               </div>
+              {/* Hidden RangePicker */}
+              <DatePicker.RangePicker
+                value={[dateFrom, dateTo]}
+                onChange={handleDateChange}
+                disabledDate={disabledDate}
+                open={isRangePickerOpen}
+                onOpenChange={(open) => setIsRangePickerOpen(open)}
+                popupClassName="custom-calendar-popup"
+                popupStyle={{ fontSize: "12px" }}
+              />
             </div>
-            {/* Hidden RangePicker */}
-            <DatePicker.RangePicker
-              value={[dateFrom, dateTo]}
-              onChange={handleDateChange}
-              disabledDate={disabledDate}
-              open={isRangePickerOpen}
-              onOpenChange={(open) => setIsRangePickerOpen(open)}
-              popupClassName="custom-calendar-popup"
-              popupStyle={{ fontSize: "12px" }}
-            />
+          )}
+        </div>
+        {hourGap !== 0 && (
+          <div className="buttons-container">
+            <Button
+              type="primary"
+              style={{ borderRadius: "50px", width: 27, height: 27 }}
+              icon={<SettingOutlined style={{ fontSize: 17 }} />}
+              onClick={() => setShowPlayerOptions(true)}
+            ></Button>
+            <Button
+              type="text"
+              style={{
+                borderRadius: "50px",
+                width: 27,
+                height: 27,
+                backgroundColor: "white",
+              }}
+              icon={
+                <CalendarOutlined style={{ color: "black", fontSize: 17 }} />
+              }
+              onClick={() => setIsRangePickerOpen(true)}
+            ></Button>
           </div>
-        </div>
-        <div className="buttons-container">
-          <Button
-            type="primary"
-            style={{ borderRadius: "50px", width: 27, height: 27 }}
-            icon={<SettingOutlined style={{ fontSize: 17 }} />}
-            onClick={() => setShowPlayerOptions(true)}
-          ></Button>
-          <Button
-            type="text"
-            style={{
-              borderRadius: "50px",
-              width: 27,
-              height: 27,
-              backgroundColor: "white",
-            }}
-            icon={<CalendarOutlined style={{ color: "black", fontSize: 17 }} />}
-            onClick={() => setIsRangePickerOpen(true)}
-          ></Button>
-        </div>
+        )}
       </div>
       <div style={{ width: "10%" }}>
-        {showPlayerOptions && <PlayerOptions />}
+        {/* {showPlayerOptions && <PlayerOptions />} */}
       </div>
     </div>
   ) : null;
