@@ -7,13 +7,22 @@ import {
   Skeleton,
   Button,
   Slider,
+  Collapse,
+  Space,
 } from "antd";
-import { CloseOutlined, CloudDownloadOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  CloudDownloadOutlined,
+  PlayCircleOutlined,
+  StepBackwardOutlined,
+  StepForwardOutlined,
+  PauseCircleOutlined,
+} from "@ant-design/icons";
 import "../styles/sensorDataTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
 import { getData, getPathData } from "../services/api/marker.service";
 import { useMarkerLayersState } from "../states/MarkerLayersState";
-import { componentTheme } from "../themes/blueTheme";
+import { componentTheme, customClasses } from "../themes/blueTheme";
 
 const { Spin: spinTheme } = componentTheme.components;
 
@@ -25,6 +34,9 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const [timeIndex, setTimeIndex] = useState(-1);
   const [loadingPath, setLoadingPath] = useState(false);
   const [positionLabel, setPositionLabel] = useState(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playIntervalRef = useRef(null);
 
   const { updateMarkerForPosition } = useMarkerLayersState.getState();
 
@@ -44,9 +56,17 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   };
 
   useEffect(() => {
+    // Reset state when marker changes
     setApiData(null);
     setPathApiData([]);
-    console.log("entra useEffect");
+    setTimeIndex(-1);
+    setPositionLabel(null);
+    setIsPlaying(false);
+    if (playIntervalRef.current) {
+      clearInterval(playIntervalRef.current);
+      playIntervalRef.current = null;
+    }
+
     if (marker.sensorType !== "LAGRANGNIAN") {
       getApiData();
     }
@@ -56,16 +76,59 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   }, [marker]);
 
   useEffect(() => {
+    // Clean up interval on unmount
+    return () => {
+      if (playIntervalRef.current) {
+        clearInterval(playIntervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (timeIndex !== -1 && marker.sensorType === "LAGRANGNIAN") {
-      updateMarkerForPosition(marker.id, timeIndex);
       let position = pathApiData[timeIndex];
+      updateMarkerForPosition(marker.id, position);
       setPositionLabel(
-        getDateString(position.positionDateTime) +
-          " | " +
-          getLatLngLabel(position)
+        getDateString(position.positionDateTime)
+        // " | " +
+        // getLatLngLabel(position)
       );
     }
   }, [timeIndex]);
+
+  const handleBackward = () => {
+    if (timeIndex > 0) {
+      setTimeIndex(timeIndex - 1);
+    }
+  };
+
+  const handleForward = () => {
+    if (timeIndex < pathApiData.length - 1) {
+      setTimeIndex(timeIndex + 1);
+    }
+  };
+
+  const handlePlay = () => {
+    if (!isPlaying) {
+      setIsPlaying(true);
+      playIntervalRef.current = setInterval(() => {
+        setTimeIndex((prevIndex) => {
+          if (prevIndex < pathApiData.length - 1) {
+            return prevIndex + 1;
+          } else {
+            clearInterval(playIntervalRef.current);
+            playIntervalRef.current = null;
+            setIsPlaying(false);
+            return prevIndex;
+          }
+        });
+      }, 1200); // Change interval time as needed
+    } else {
+      clearInterval(playIntervalRef.current);
+      playIntervalRef.current = null;
+      setIsPlaying(false);
+    }
+  };
 
   const getDateString = (jsonDateStr) => {
     const date = new Date(jsonDateStr);
@@ -119,7 +182,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
     {
       title: "Nombre",
       dataIndex: "variableName",
-      key: "variableName" + Math.random(),
+      key: "variableName",
       width: "200px",
     },
     {
@@ -130,6 +193,8 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
       width: "100px",
     },
   ];
+
+  const defaultActiveKey = marker.sensorType === "LAGRANGNIAN" ? [] : ["1"];
 
   return (
     <div onMouseMove={onHover}>
@@ -151,7 +216,6 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
             {getPositionLabel()}
           </Descriptions.Item>
           <Descriptions.Item label="Estado">
-            {" "}
             <Badge status={getStatus(marker)} text={getStatusLabel(marker)} />
           </Descriptions.Item>
           <Descriptions.Item label="Última medición">
@@ -166,7 +230,6 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
             )}
           </Descriptions.Item>
           <Descriptions.Item label="Datos">
-            {" "}
             <div style={{ display: "flex", columnGap: 5 }}>
               <Button type="dashed" onClick={onGraphichOpen}>
                 Gráficas
@@ -178,7 +241,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
           </Descriptions.Item>
         </Descriptions>
         {marker.sensorType === "LAGRANGNIAN" && (
-          <div className="slider-container">
+          <div className="slider-main-container">
             <Spin
               spinning={loadingPath}
               tip="Cargando datos..."
@@ -186,35 +249,85 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
             >
               {!loadingPath && (
                 <>
-                  <Slider
-                    min={0}
-                    max={pathApiData.length - 1}
-                    step={1}
-                    value={timeIndex}
-                    onChange={setTimeIndex}
-                  />
-                  {positionLabel}
+                  <div className="slider-container">
+                    {" "}
+                    <Slider
+                      style={{ width: "95%" }}
+                      min={0}
+                      max={pathApiData.length - 1}
+                      step={1}
+                      value={timeIndex}
+                      onChange={setTimeIndex}
+                    />
+                    <div className="label-path-class">{positionLabel}</div>
+                    <Space
+                      style={{
+                        width: "350px",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Button
+                        onClick={handleBackward}
+                        disabled={timeIndex <= 0 || isPlaying}
+                        icon={<StepBackwardOutlined />}
+                      >
+                        Atrás
+                      </Button>
+                      <Button
+                        onClick={handleForward}
+                        disabled={
+                          timeIndex >= pathApiData.length - 1 || isPlaying
+                        }
+                        icon={<StepForwardOutlined />}
+                      >
+                        Adelante
+                      </Button>
+                      <Button
+                        onClick={handlePlay}
+                        disabled={pathApiData.length === 0}
+                        icon={
+                          isPlaying ? (
+                            <PauseCircleOutlined />
+                          ) : (
+                            <PlayCircleOutlined />
+                          )
+                        }
+                      >
+                        {isPlaying ? "Pausar" : "Play"}
+                      </Button>
+                    </Space>
+                  </div>
                 </>
               )}
             </Spin>
           </div>
         )}
-        <div className="table-container">
-          <Spin
-            spinning={loadingData}
-            tip="Cargando datos..."
-            style={{ color: spinTheme.colorTextBase }}
+        <div className="sensorData-container">
+          <Collapse
+            defaultActiveKey={defaultActiveKey}
+            style={{ ...customClasses }}
           >
-            {!loadingData && (
-              <Table
-                columns={columns}
-                dataSource={apiData}
-                pagination={false}
-                rowKey="variableName"
-                scroll={{ y: 240 }}
-              />
-            )}
-          </Spin>
+            <Collapse.Panel header="Mediciones" key="1">
+              <div className="table-container">
+                <Spin
+                  spinning={loadingData}
+                  tip="Cargando datos..."
+                  style={{ color: spinTheme.colorTextBase }}
+                >
+                  {!loadingData && (
+                    <Table
+                      columns={columns}
+                      dataSource={apiData}
+                      pagination={false}
+                      rowKey="variableName"
+                      scroll={{ y: 240 }}
+                    />
+                  )}
+                </Spin>
+              </div>
+            </Collapse.Panel>
+          </Collapse>
         </div>
       </Card>
     </div>

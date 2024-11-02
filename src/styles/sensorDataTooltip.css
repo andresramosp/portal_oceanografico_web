@@ -65,10 +65,26 @@
 }
 
 .custom-tooltip-card .slider-container {
-  min-height: 50px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   height: 100%;
   flex-direction: column;
   flex-wrap: nowrap;
+  padding-bottom: 10px;
+  align-content: flex-start;
+  align-items: center;
+}
+
+.label-path-class {
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 12px;
+  margin-top: -7px;
+}
+
+.custom-tooltip-card .slider-main-container {
+  width: 100%;
+  display: grid;
+  min-height: 64px;
+  height: 100p;
 }

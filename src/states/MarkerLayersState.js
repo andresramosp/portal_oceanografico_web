@@ -6,16 +6,27 @@ import * as d3 from "d3-ease";
 
 export const useMarkerLayersState = create((set, get) => ({
   domains: [],
+
   setDomains: (domains) => set({ domains }),
 
   getMarkers: async (newDomains) => {
     const mapState = useMapState.getState();
     let newLayers = [];
     for (let domain of newDomains) {
-      const data = await getMarkers(domain);
+      let data = await getMarkers(domain);
+
+      data = data.filter((d) => d.id == 196 || domain.sensorType == "EULERIAN");
+
+      data = data.map((d) => {
+        return {
+          ...d,
+          latitude: d.id == 196 ? 35.914776 : d.latitude,
+          longitude: d.id == 196 ? -5.75684166 : d.longitude,
+        };
+      });
 
       const iconLayer = new IconLayer({
-        id: (d) => "IconLayer-" + domain.id + "-" + d.id,
+        id: `icon-layer-${domain.id}`,
         data,
         dataTransform: (result) =>
           result.map((d) => {
@@ -36,7 +47,7 @@ export const useMarkerLayersState = create((set, get) => ({
         //   domain.sensorType == "LAGRANGNIAN"
         //     ? {
         //         getPosition: {
-        //           duration: 2000,
+        //           duration: 500,
         //           easing: (d) => d3.easeCubicInOut(d),
         //         },
         //       }
@@ -56,48 +67,64 @@ export const useMarkerLayersState = create((set, get) => ({
   },
 
   updateMarkerForPosition: (markerId, position) => {
-    // TODO: para ser llamado con el slider-mini-player para una sola boya
-    // TODO: hay que pensar como se gestiona esto para un solo marker, ya que hasta ahora hemos tratado layers con varios markers
-    // Quiza solo iterar como antes, pero filtrando por el id, y actualizarle la position... (SI)
-    // TODO: tener en cuenta requisito de dejar visible position final, por lo que quizas seria mejor añadir un nuevo marker para la animacion?
-  },
-
-  // Usar para crear el metodo de arriba y borrar
-  getMarkersForIndex: (index) => {
+    // Get the map state
     const mapState = useMapState.getState();
-    let updatedLayers = [];
+    // Get the current layers from the map state
+    const layers = mapState.layers;
 
-    for (let iconLayer of get().mobileLayers) {
-      // Get the existing data from the layer
-      const data = iconLayer.props.data;
+    let updatedLayer = null;
 
-      // Update the position for each data point based on the new index
-      const updatedData = data.map((d) => ({
-        ...d,
-        position: d.positions[index],
-      }));
+    // Iterate over layers to find the layer containing the marker
+    for (let layer of layers) {
+      // Only process IconLayers (marker layers)
+      if (layer instanceof IconLayer) {
+        // Get the data from the layer
+        const data = layer.props.data;
 
-      // Create a new IconLayer with the updated data
-      const updatedIconLayer = new IconLayer({
-        ...iconLayer.props,
-        data: updatedData,
-        id: iconLayer.props.id,
-        transitions: {
-          getPosition: {
-            duration: 2000,
-            easing: (t) => d3.easeCubicInOut(t),
-          },
-        },
-      });
+        // Find the index of the marker in the data
+        const markerIndex = data.findIndex((d) => d.id === markerId);
 
-      updatedLayers.push(updatedIconLayer);
+        if (markerIndex !== -1) {
+          // We found the marker in this layer
+          // Create a new data array with the updated position for the marker
+          const newData = [...data];
+          const marker = newData[markerIndex];
+
+          // Update the position of the marker
+          newData[markerIndex] = {
+            ...marker,
+            latitude: position.latitude,
+            longitude: position.longitude,
+          };
+
+          // Get sensorType from layer's userData
+          const sensorType = layer.props.userData.sensorType;
+
+          // Create a new layer with the updated data
+          updatedLayer = new IconLayer({
+            ...layer.props,
+            data: newData,
+            transitions:
+              sensorType === "LAGRANGNIAN"
+                ? {
+                    getPosition: {
+                      duration: 750,
+                      easing: (t) => d3.easeCubicInOut(t),
+                    },
+                  }
+                : undefined,
+          });
+
+          // We found and updated the layer, so we can break out of the loop
+          break;
+        }
+      }
     }
 
-    // Update the layers in the map state
-    mapState.addOrUpdateLayers(updatedLayers);
-
-    // Optionally, update the mobileLayers in the store
-    get().setMobileLayers(updatedLayers);
+    if (updatedLayer) {
+      // Update the layers in the map state using addOrUpdateLayers
+      mapState.addOrUpdateLayers([updatedLayer]);
+    }
   },
 
   addDomains: (newDomains) => {
@@ -112,11 +139,5 @@ export const useMarkerLayersState = create((set, get) => ({
       const mapState = useMapState.getState();
       mapState.removeLayers(optionId);
     }
-    // Remove corresponding mobile layers
-
-    // const newMobileLayers = get().mobileLayers.filter(
-    //   (layer) => layer.props.userData.option.id !== optionId
-    // );
-    // get().setMobileLayers(newMobileLayers);
   },
 }));
