@@ -24,6 +24,10 @@ import { getData, getPathData } from "../services/api/marker.service";
 import { useMarkerLayersState } from "../states/MarkerLayersState";
 import { componentTheme, customClasses } from "../themes/blueTheme";
 
+// Import LineLayer from deck.gl
+import { LineLayer } from "@deck.gl/layers";
+import useMapState from "../states/MapState";
+
 const { Spin: spinTheme } = componentTheme.components;
 
 const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
@@ -39,6 +43,10 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const playIntervalRef = useRef(null);
 
   const { updateMarkerForPosition } = useMarkerLayersState.getState();
+
+  // Initialize mapState
+  const mapState = useMapState.getState();
+  const pathLayerId = `path-layer-${marker.id}`;
 
   const getApiData = async () => {
     setLoadingData(true);
@@ -56,6 +64,9 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   };
 
   useEffect(() => {
+    // Remove previous path layer if exists
+    mapState.removeLayers([pathLayerId]);
+
     // Reset state when marker changes
     setApiData(null);
     setPathApiData([]);
@@ -76,11 +87,12 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   }, [marker]);
 
   useEffect(() => {
-    // Clean up interval on unmount
+    // Clean up interval and remove path layer on unmount
     return () => {
       if (playIntervalRef.current) {
         clearInterval(playIntervalRef.current);
       }
+      mapState.removeLayers([pathLayerId]);
     };
   }, []);
 
@@ -88,13 +100,41 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
     if (timeIndex !== -1 && marker.sensorType === "LAGRANGNIAN") {
       let position = pathApiData[timeIndex];
       updateMarkerForPosition(marker.id, position);
-      setPositionLabel(
-        getDateString(position.positionDateTime)
-        // " | " +
-        // getLatLngLabel(position)
-      );
+      setPositionLabel(getDateString(position.positionDateTime));
     }
   }, [timeIndex]);
+
+  // Add path layer to the map when pathApiData changes
+  useEffect(() => {
+    if (pathApiData && pathApiData.length > 0) {
+      // Prepare data for LineLayer
+      const pathLineData = pathApiData.slice(0, -1).map((point, index) => {
+        const nextPoint = pathApiData[index + 1];
+        return {
+          sourcePosition: [point.longitude, point.latitude],
+          targetPosition: [nextPoint.longitude, nextPoint.latitude],
+        };
+      });
+
+      // Create LineLayer
+      const pathLayer = new LineLayer({
+        id: pathLayerId,
+        data: pathLineData,
+        getSourcePosition: (d) => d.sourcePosition,
+        getTargetPosition: (d) => d.targetPosition,
+        getColor: [255, 0, 0],
+        getOpacity: 0.5,
+        getWidth: 1,
+        userData: {
+          option: marker.domain.option,
+          zIndex: 3,
+        },
+      });
+
+      // Add or update the layer
+      mapState.addOrUpdateLayers([pathLayer]);
+    }
+  }, [pathApiData]);
 
   const handleBackward = () => {
     if (timeIndex > 0) {
