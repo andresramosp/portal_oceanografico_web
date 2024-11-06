@@ -52,6 +52,7 @@ export const Player = () => {
     getLayersForTime: getHeatmapLayersForTime,
     domains: heatmapDomains,
     setPalette,
+    variable,
   } = useHeatmapLayersState();
 
   const { getLayersForTime: getTileLayersForTime, domains: tilemapDomains } =
@@ -209,9 +210,7 @@ export const Player = () => {
           )}
         </div>
         <div style={{ width: "97%" }}>
-          <div className="legend-container">
-            <PlayerLegend />
-          </div>
+          <div className="legend-container">{variable && <PlayerLegend />}</div>
           {hourGap !== 0 && (
             <div className="controls-container">
               <div style={{ width: "100%" }}>

@@ -138,6 +138,9 @@ export const useHeatmapLayersState = create((set, get) => ({
         get().refreshLayers();
       }
     }
+    if (newDomains == 0) {
+      get().setVariable(null);
+    }
   },
 }));
 

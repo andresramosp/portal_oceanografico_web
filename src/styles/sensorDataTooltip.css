@@ -88,3 +88,7 @@
   min-height: 64px;
   height: 100p;
 }
+
+.custom-tooltip-card .ant-collapse-content-box {
+  padding: 0px !important;
+}

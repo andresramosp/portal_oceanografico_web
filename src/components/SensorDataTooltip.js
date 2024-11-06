@@ -24,7 +24,7 @@ import { getData, getPathData } from "../services/api/marker.service";
 import { useMarkerLayersState } from "../states/MarkerLayersState";
 import { componentTheme, customClasses } from "../themes/blueTheme";
 
-// Import LineLayer from deck.gl
+// Importar LineLayer de deck.gl
 import { LineLayer } from "@deck.gl/layers";
 import useMapState from "../states/MapState";
 
@@ -42,9 +42,11 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const playIntervalRef = useRef(null);
 
+  const [tableData, setTableData] = useState([]);
+
   const { updateMarkerForPosition } = useMarkerLayersState.getState();
 
-  // Initialize mapState
+  // Inicializar mapState
   const mapState = useMapState.getState();
   const pathLayerId = `path-layer-${marker.id}`;
 
@@ -64,10 +66,10 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   };
 
   useEffect(() => {
-    // Remove previous path layer if exists
+    // Eliminar la capa de ruta anterior si existe
     mapState.removeLayers([pathLayerId]);
 
-    // Reset state when marker changes
+    // Restablecer el estado cuando el marcador cambia
     setApiData(null);
     setPathApiData([]);
     setTimeIndex(-1);
@@ -87,7 +89,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   }, [marker]);
 
   useEffect(() => {
-    // Clean up interval and remove path layer on unmount
+    // Limpiar el intervalo y eliminar la capa de ruta al desmontar
     return () => {
       if (playIntervalRef.current) {
         clearInterval(playIntervalRef.current);
@@ -102,12 +104,12 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
       updateMarkerForPosition(marker.id, position);
       setPositionLabel(getDateString(position.positionDateTime));
     }
-  }, [timeIndex]);
+  }, [timeIndex, pathApiData]);
 
-  // Add path layer to the map when pathApiData changes
+  // Añadir la capa de ruta al mapa cuando pathApiData cambia
   useEffect(() => {
     if (pathApiData && pathApiData.length > 0) {
-      // Prepare data for LineLayer
+      // Preparar datos para LineLayer
       const pathLineData = pathApiData.slice(0, -1).map((point, index) => {
         const nextPoint = pathApiData[index + 1];
         return {
@@ -116,7 +118,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
         };
       });
 
-      // Create LineLayer
+      // Crear LineLayer
       const pathLayer = new LineLayer({
         id: pathLayerId,
         data: pathLineData,
@@ -131,10 +133,41 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
         },
       });
 
-      // Add or update the layer
+      // Añadir o actualizar la capa
       mapState.addOrUpdateLayers([pathLayer]);
     }
   }, [pathApiData]);
+
+  // Obtener los datos para la tabla dependiendo del tipo de boya
+  useEffect(() => {
+    if (marker.sensorType === "LAGRANGNIAN") {
+      // Si ya tenemos los datos de pathApiData y el timeIndex es válido
+      if (pathApiData.length > 0 && timeIndex !== -1) {
+        const currentPosition = pathApiData[timeIndex];
+        const variables = currentPosition.variables || {};
+        const formattedData = formatVariablesForTable(variables);
+        setTableData(formattedData);
+      } else {
+        setTableData([]);
+      }
+    } else {
+      // Para boyas Eulerianas, usar apiData
+      if (apiData && apiData.length > 0) {
+        setTableData(apiData);
+      } else {
+        setTableData([]);
+      }
+    }
+  }, [apiData, pathApiData, timeIndex]);
+
+  // Función para formatear las variables para la tabla
+  const formatVariablesForTable = (variables) => {
+    return Object.entries(variables).map(([key, value]) => ({
+      variableName: key,
+      value: value,
+      unit: "", // No tenemos las unidades para las boyas Lagrangianas
+    }));
+  };
 
   const handleBackward = () => {
     if (timeIndex > 0) {
@@ -162,7 +195,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
             return prevIndex;
           }
         });
-      }, 1200); // Change interval time as needed
+      }, 1200); // Cambiar el tiempo del intervalo según sea necesario
     } else {
       clearInterval(playIntervalRef.current);
       playIntervalRef.current = null;
@@ -188,9 +221,11 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const getLatLngLabel = (position) => {
     const cardinalLat = position.latitude > 0 ? "N" : "S";
     const cardinalLon = position.longitude > 0 ? "O" : "E";
-    return `Lat ${position.latitude.toFixed(
+    return `Lat ${Math.abs(position.latitude).toFixed(
       2
-    )}º ${cardinalLat} Lon ${position.longitude.toFixed(2)}º ${cardinalLon}`;
+    )}º ${cardinalLat} Lon ${Math.abs(position.longitude).toFixed(
+      2
+    )}º ${cardinalLon}`;
   };
 
   const getPositionLabel = () => {
@@ -204,18 +239,20 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
     } else {
       const cardinalLat = marker.latitude > 0 ? "N" : "S";
       const cardinalLon = marker.longitude > 0 ? "O" : "E";
-      return `Lat ${marker.latitude.toFixed(
+      return `Lat ${Math.abs(marker.latitude).toFixed(
         2
-      )}º ${cardinalLat} Lon ${marker.longitude.toFixed(2)}º ${cardinalLon}`;
+      )}º ${cardinalLat} Lon ${Math.abs(marker.longitude).toFixed(
+        2
+      )}º ${cardinalLon}`;
     }
   };
 
   const getStatusLabel = (data) => {
-    return data.status == 0 ? "Funcionando" : "Parado";
+    return data.status === 0 ? "Funcionando" : "Parado";
   };
 
   const getStatus = (data) => {
-    return data.status == 0 ? "processing" : "error";
+    return data.status === 0 ? "processing" : "error";
   };
 
   const columns = [
@@ -229,7 +266,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
       title: "Valor",
       dataIndex: "value",
       key: "value",
-      render: (text, record) => `${text.toFixed(4)} ${record.unit}`,
+      render: (text, record) => `${parseFloat(text).toFixed(4)} ${record.unit}`,
       width: "100px",
     },
   ];
@@ -258,17 +295,19 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
           <Descriptions.Item label="Estado">
             <Badge status={getStatus(marker)} text={getStatusLabel(marker)} />
           </Descriptions.Item>
-          <Descriptions.Item label="Última medición">
-            {apiData ? (
-              new Date(apiData[0].date).toLocaleString()
-            ) : (
-              <Skeleton.Input
-                style={{ width: 200 }}
-                active={true}
-                size="small"
-              />
-            )}
-          </Descriptions.Item>
+          {marker.sensorType !== "LAGRANGNIAN" && (
+            <Descriptions.Item label="Última medición">
+              {apiData && apiData.length > 0 ? (
+                new Date(apiData[0].date).toLocaleString()
+              ) : (
+                <Skeleton.Input
+                  style={{ width: 200 }}
+                  active={true}
+                  size="small"
+                />
+              )}
+            </Descriptions.Item>
+          )}
           <Descriptions.Item label="Datos">
             <div style={{ display: "flex", columnGap: 5 }}>
               <Button type="dashed" onClick={onGraphichOpen}>
@@ -290,7 +329,6 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
               {!loadingPath && (
                 <>
                   <div className="slider-container">
-                    {" "}
                     <Slider
                       style={{ width: "95%" }}
                       min={0}
@@ -351,14 +389,14 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
             <Collapse.Panel header="Mediciones" key="1">
               <div className="table-container">
                 <Spin
-                  spinning={loadingData}
+                  spinning={loadingData || loadingPath}
                   tip="Cargando datos..."
                   style={{ color: spinTheme.colorTextBase }}
                 >
-                  {!loadingData && (
+                  {!loadingData && !loadingPath && (
                     <Table
                       columns={columns}
-                      dataSource={apiData}
+                      dataSource={tableData}
                       pagination={false}
                       rowKey="variableName"
                       scroll={{ y: 240 }}
