@@ -24,10 +24,16 @@ export const usePlayingState = create((set, get) => ({
   animationFrameId: null,
   animationFrameSetTimeoutId: null,
 
+  syncedWithPath: false,
+  playingDomains: [], // uso exclusivo para recuperarlos tras el unsync de forma sencilla
+
   setDomainType: (domainType) => set({ domainType }),
   setTimeIndex: (timeIndex) => set({ timeIndex }),
   setPlaying: (playing) => set({ playing }),
   setPaused: (paused) => set({ paused }),
+
+  setSyncedWithPath: (syncedWithPath) => set({ syncedWithPath }),
+  setPlayingDomains: (playingDomains) => set({ playingDomains }),
 
   setMinDateFrom: (minDateFrom) =>
     set({ minDateFrom: minDateFrom ? dayjs(minDateFrom) : null }),
@@ -56,6 +62,31 @@ export const usePlayingState = create((set, get) => ({
 
     // get().setTimeIndex(-1);
     get().getTimeIntervalArray();
+
+    get().setPlayingDomains(domains);
+  },
+
+  syncWithPath: (pathArray, timeIndex) => {
+    get().setSyncedWithPath(true);
+    get().pause();
+
+    let timeInterval = pathArray.map((d) => d.positionDateTime);
+
+    get().setMinDateFrom(timeInterval[0]);
+    get().setmaxDateTo(timeInterval[timeInterval.length - 1]);
+
+    get().setDateFrom(timeInterval[0]);
+    get().setDateTo(timeInterval[timeInterval.length - 1]);
+
+    set({ timeInterval });
+    get().setHourGap(1);
+    get().setTimeIndex(timeIndex);
+  },
+
+  unSyncWithPath: () => {
+    get().setSyncedWithPath(false);
+    get().setPlayerInterval(get().playingDomains);
+    get().setTimeIndex(0);
   },
 
   togglePlaying: () => {

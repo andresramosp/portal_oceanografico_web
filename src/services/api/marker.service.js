@@ -42,7 +42,7 @@ export const getPathData = async (domain, sensorId) => {
   return [
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-14T20:00:00",
+      positionDateTime: "2024-08-05T20:00:00",
       latitude: 36.16,
       longitude: -6.66,
       speed: 0.0,
@@ -54,7 +54,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-14T21:00:00",
+      positionDateTime: "2024-08-05T21:00:00",
       latitude: 36.12,
       longitude: -6.62,
       speed: 0.0,
@@ -66,7 +66,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-14T22:00:00",
+      positionDateTime: "2024-08-05T22:00:00",
       latitude: 36.08,
       longitude: -6.58,
       speed: 0.0,
@@ -78,7 +78,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-14T23:00:00",
+      positionDateTime: "2024-08-05T23:00:00",
       latitude: 36.04,
       longitude: -6.54,
       speed: 0.0,
@@ -90,7 +90,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T00:00:00",
+      positionDateTime: "2024-08-06T00:00:00",
       latitude: 36.0,
       longitude: -6.5,
       speed: 0.0,
@@ -102,7 +102,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T01:00:00",
+      positionDateTime: "2024-08-06T01:00:00",
       latitude: 35.98,
       longitude: -6.48,
       speed: 0.0,
@@ -114,7 +114,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T02:00:00",
+      positionDateTime: "2024-08-06T02:00:00",
       latitude: 35.96,
       longitude: -6.45,
       speed: 0.0,
@@ -126,7 +126,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T03:00:00",
+      positionDateTime: "2024-08-06T03:00:00",
       latitude: 35.94,
       longitude: -6.41,
       speed: 0.0,
@@ -138,7 +138,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T04:00:00",
+      positionDateTime: "2024-08-06T04:00:00",
       latitude: 35.92,
       longitude: -6.36,
       speed: 0.0,
@@ -150,7 +150,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T05:00:00",
+      positionDateTime: "2024-08-06T05:00:00",
       latitude: 35.91,
       longitude: -6.3,
       speed: 0.0,
@@ -162,7 +162,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T06:00:00",
+      positionDateTime: "2024-08-06T06:00:00",
       latitude: 35.9,
       longitude: -6.23,
       speed: 0.0,
@@ -174,7 +174,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T07:00:00",
+      positionDateTime: "2024-08-06T07:00:00",
       latitude: 35.9,
       longitude: -6.16,
       speed: 0.0,
@@ -186,7 +186,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T08:00:00",
+      positionDateTime: "2024-08-06T08:00:00",
       latitude: 35.91,
       longitude: -6.09,
       speed: 0.0,
@@ -198,7 +198,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T09:00:00",
+      positionDateTime: "2024-08-06T09:00:00",
       latitude: 35.92,
       longitude: -6.02,
       speed: 0.0,
@@ -210,7 +210,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T10:00:00",
+      positionDateTime: "2024-08-06T10:00:00",
       latitude: 35.915,
       longitude: -5.88,
       speed: 0.0,
@@ -222,7 +222,7 @@ export const getPathData = async (domain, sensorId) => {
     },
     {
       receptionDateTime: null,
-      positionDateTime: "2024-10-15T11:00:00",
+      positionDateTime: "2024-08-06T11:00:00",
       latitude: 35.914776,
       longitude: -5.75684166,
       speed: 0.0,

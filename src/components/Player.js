@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Slider, Button, DatePicker } from "antd";
+import { Slider, Button, DatePicker, Tooltip } from "antd";
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
   CalendarOutlined,
   SettingOutlined,
   CloudDownloadOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import "../styles/player.css";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
@@ -46,6 +47,7 @@ export const Player = () => {
     hourGap,
     setHourGap,
     setRange,
+    syncedWithPath,
   } = usePlayingState();
 
   const {
@@ -77,20 +79,20 @@ export const Player = () => {
   const initHeatmapPlayer = async (domains) => {
     setDomainType("heatmap");
     setHourGap(domains[0].hourGap);
-    if (domains[0].hourGap) await setPlayerInterval(domains);
+    if (domains[0].hourGap && !syncedWithPath) await setPlayerInterval(domains);
     await setPalette();
   };
 
   const initParticlesPlayer = async (domains) => {
     setDomainType("heatmap");
     setHourGap(domains[0].hourGap);
-    await setPlayerInterval(domains);
+    if (!syncedWithPath) await setPlayerInterval(domains);
   };
 
   const initTilemapPlayer = async (domains) => {
     setDomainType("tilemap");
     setHourGap(domains[0].hourGap);
-    await setPlayerInterval(domains);
+    if (!syncedWithPath) await setPlayerInterval(domains);
   };
 
   const getDateString = (jsonDateStr) => {
@@ -198,18 +200,24 @@ export const Player = () => {
             onClick={() => setDownloadDialogVisible(true)}
           ></Button>
           {hourGap !== 0 && (
-            <Button
-              type="primary"
-              style={{ borderRadius: "50px", width: 30, height: 30 }}
-              icon={
-                !paused ? (
-                  <PauseCircleOutlined style={{ fontSize: 24 }} />
-                ) : (
-                  <PlayCircleOutlined style={{ fontSize: 24 }} />
-                )
-              }
-              onClick={togglePlaying}
-            ></Button>
+            <Tooltip title={syncedWithPath ? "Sincronizado con boya" : ""}>
+              {" "}
+              <Button
+                type="primary"
+                style={{ borderRadius: "50px", width: 30, height: 30 }}
+                icon={
+                  syncedWithPath ? (
+                    <SyncOutlined style={{ color: "red" }} />
+                  ) : !paused ? (
+                    <PauseCircleOutlined style={{ fontSize: 24 }} />
+                  ) : (
+                    <PlayCircleOutlined style={{ fontSize: 24 }} />
+                  )
+                }
+                onClick={togglePlaying}
+                disabled={syncedWithPath}
+              ></Button>
+            </Tooltip>
           )}
         </div>
         <div style={{ width: "97%" }}>
@@ -224,6 +232,7 @@ export const Player = () => {
                   value={timeIndex}
                   onChange={setTimeIndex}
                   style={{ width: "100%" }}
+                  disabled={syncedWithPath}
                   tooltip={{
                     formatter: (value) =>
                       getDateString(timeInterval[timeIndex]),
@@ -259,6 +268,7 @@ export const Player = () => {
               </div>
               {/* Hidden RangePicker */}
               <DatePicker.RangePicker
+                disabled={syncedWithPath}
                 value={[dateFrom, dateTo]}
                 onChange={handleDateChange}
                 disabledDate={disabledDate}

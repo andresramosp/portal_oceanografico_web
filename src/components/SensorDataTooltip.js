@@ -9,6 +9,7 @@ import {
   Slider,
   Collapse,
   Space,
+  Tooltip,
 } from "antd";
 import {
   CloseOutlined,
@@ -17,6 +18,9 @@ import {
   StepBackwardOutlined,
   StepForwardOutlined,
   PauseCircleOutlined,
+  SyncOutlined,
+  StopFilled,
+  StopOutlined,
 } from "@ant-design/icons";
 import "../styles/sensorDataTooltip.css";
 import React, { useEffect, useRef, useState } from "react";
@@ -27,6 +31,7 @@ import { componentTheme, customClasses } from "../themes/blueTheme";
 // Importar LineLayer de deck.gl
 import { LineLayer } from "@deck.gl/layers";
 import useMapState from "../states/MapState";
+import { usePlayingState } from "../states/PlayingState";
 
 const { Spin: spinTheme } = componentTheme.components;
 
@@ -45,6 +50,13 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
   const [tableData, setTableData] = useState([]);
 
   const { updateMarkerForPosition } = useMarkerLayersState.getState();
+
+  const {
+    syncWithPath,
+    unSyncWithPath,
+    syncedWithPath,
+    setTimeIndex: setPlayerTimeIndex,
+  } = usePlayingState();
 
   // Inicializar mapState
   const mapState = useMapState.getState();
@@ -103,6 +115,9 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
       let position = pathApiData[timeIndex];
       updateMarkerForPosition(marker.id, position);
       setPositionLabel(getDateString(position.positionDateTime));
+      if (syncedWithPath) {
+        setPlayerTimeIndex(timeIndex);
+      }
     }
   }, [timeIndex, pathApiData]);
 
@@ -203,6 +218,14 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
     }
   };
 
+  const syncClick = () => {
+    if (!syncedWithPath) {
+      syncWithPath(pathApiData, timeIndex);
+    } else {
+      unSyncWithPath();
+    }
+  };
+
   const getDateString = (jsonDateStr) => {
     const date = new Date(jsonDateStr);
     return date
@@ -247,6 +270,11 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
     }
   };
 
+  const handleOnClose = () => {
+    unSyncWithPath();
+    onClose();
+  };
+
   const getStatusLabel = (data) => {
     return data.status === 0 ? "Funcionando" : "Parado";
   };
@@ -282,7 +310,7 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
         extra={
           <Button
             type="text"
-            onClick={onClose}
+            onClick={handleOnClose}
             icon={<CloseOutlined style={{ color: "white" }} />}
           />
         }
@@ -345,6 +373,25 @@ const SensorDataTooltip = ({ onHover, onGraphichOpen, marker, onClose }) => {
                         justifyContent: "center",
                       }}
                     >
+                      <Tooltip
+                        title={
+                          !syncedWithPath
+                            ? "Sincronizar con el reproductor"
+                            : "Cancelar sincronización"
+                        }
+                      >
+                        <Button
+                          onClick={syncClick}
+                          icon={
+                            !syncedWithPath ? (
+                              <SyncOutlined />
+                            ) : (
+                              <StopOutlined style={{ color: "red" }} />
+                            )
+                          }
+                        ></Button>
+                      </Tooltip>
+
                       <Button
                         onClick={handleBackward}
                         disabled={timeIndex <= 0 || isPlaying}
