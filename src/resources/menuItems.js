@@ -17,20 +17,6 @@ export default [
         ],
       },
       {
-        id: "pde-salinity-GIB",
-        optionName: "Salinidad PdE GIB",
-        optionType: "actionable",
-        variable: "salinity",
-        mapResources: [
-          {
-            id: "pde-salinity-gibreg",
-            sourceId: "pde",
-            resourceType: "heatmap",
-            url: "/GIB-REG",
-          },
-        ],
-      },
-      {
         id: "pde-temp-GIB",
         optionName: "Temperatura PdE GIB",
         optionType: "actionable",
@@ -44,6 +30,35 @@ export default [
           },
         ],
       },
+      {
+        id: "cop-tiles-temp",
+        optionName: "Temp. Tiles Cop.",
+        optionType: "actionable",
+        variable: "temperature",
+        mapResources: [
+          {
+            id: "cop-tiles-tem",
+            sourceId: "pde",
+            resourceType: "tilemap",
+            url: null, // traerá domains por variable y sourceId
+          },
+        ],
+      },
+      {
+        id: "pde-salinity-GIB",
+        optionName: "Salinidad PdE GIB",
+        optionType: "actionable",
+        variable: "salinity",
+        mapResources: [
+          {
+            id: "pde-salinity-gibreg",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/GIB-REG",
+          },
+        ],
+      },
+
       {
         id: "pde-salinity-ALM",
         optionName: "Salinidad PdE ALM",
@@ -134,20 +149,7 @@ export default [
           },
         ],
       },
-      {
-        id: "cop-tiles-temp",
-        optionName: "Temp. Tiles Cop.",
-        optionType: "actionable",
-        variable: "temp",
-        mapResources: [
-          {
-            id: "cop-tiles-tem",
-            sourceId: "pde",
-            resourceType: "tilemap",
-            url: null, // traerá domains por variable y sourceId
-          },
-        ],
-      },
+
       {
         optionName: "Dispositivos Southtek",
         optionType: "dropdown",
@@ -156,6 +158,7 @@ export default [
             id: "boyas-eulerianas",
             optionName: "Boyas Eulerianas",
             optionType: "actionable",
+            icon: "boya_euleriana",
             mapResources: [
               {
                 sourceId: "southtek",
@@ -168,6 +171,7 @@ export default [
             id: "boyas-moviles",
             optionName: "Boyas Lagragnianas",
             optionType: "actionable",
+            icon: "boya_lagrangniana",
             mapResources: [
               {
                 sourceId: "southtek",

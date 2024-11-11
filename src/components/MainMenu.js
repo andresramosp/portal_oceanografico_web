@@ -1,9 +1,10 @@
 import React from "react";
-import { Collapse, Checkbox } from "antd";
+import { Collapse } from "antd";
 import "antd/dist/reset.css";
 import "../styles/mainMenu.scss";
 import useMenuState from "../states/MenuState";
 import { componentTheme, customClasses } from "../themes/blueTheme";
+import { variableIcons, otherIcons } from "../resources/menuIcons";
 
 const { Collapse: collapseTheme } = componentTheme.components;
 
@@ -36,21 +37,35 @@ const MainMenu = () => {
 const Option = ({ option }) => {
   const { setOptionValue } = useMenuState((state) => ({ ...state }));
 
-  const onChangeOption = async (e) => {
+  const onChangeOption = () => {
     setOptionValue(option.id, !option.checked);
   };
 
+  const IconComponent =
+    variableIcons[option.variable] ||
+    otherIcons[option.icon] ||
+    otherIcons.default;
+
   if (option.optionType === "actionable") {
     return (
-      <div className="checkbox-option">
-        <Checkbox
-          style={{ color: collapseTheme.colorTextBase, fontWeight: 100 }}
-          onChange={() => onChangeOption(option)}
-          value={option.variable}
-          checked={option.checked}
+      <div
+        className="checkbox-option"
+        onClick={onChangeOption}
+        style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+      >
+        <IconComponent
+          style={{ color: option.checked ? "blue" : "black" }}
+          alt="Descripción del icono"
+        />
+        <span
+          style={{
+            marginLeft: "8px",
+            color: collapseTheme.colorTextBase,
+            fontWeight: 100,
+          }}
         >
           {option.optionName}
-        </Checkbox>
+        </span>
       </div>
     );
   } else if (option.optionType === "dropdown") {

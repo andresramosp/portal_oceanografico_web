@@ -7,7 +7,7 @@
   flex-direction: row;
   width: 100%;
   padding: 8px;
-  gap: 10px
+  gap: 10px;
 }
 
 .player-options-container {
@@ -18,17 +18,16 @@
   height: 100%;
   display: flex;
   justify-content: center;
-
 }
 
 .player-main-container {
   background-color: rgba(0, 0, 0, 0.5);
-  
+
   padding: 8px;
   display: flex;
   flex-direction: row;
   border-radius: 14px;
-  gap: 15px;
+  /* gap: 15px; */
 }
 
 .date-labels-container {
@@ -50,7 +49,6 @@
   display: flex;
   align-items: center;
   gap: 7px;
-
 }
 
 .buttons-container {
@@ -91,7 +89,6 @@ color-legend.styled {
   bottom: 70px;
 }
 
-
 /* Optional: Change the header background */
 .custom-calendar-popup .ant-picker-header {
   background-color: rgba(0, 0, 0, 0.5);
@@ -99,11 +96,16 @@ color-legend.styled {
 
 /* Optional: Change the content background */
 .custom-calendar-popup .ant-picker-body {
-  background-color: rgba(0, 0, 0, 0.5) !important; /* Replace with your desired color */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ) !important; /* Replace with your desired color */
   color: white;
 }
 
 .custom-calendar-popup .ant-picker-cell {
   color: white;
-  padding: 3px
+  padding: 3px;
 }

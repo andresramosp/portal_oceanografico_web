@@ -185,7 +185,10 @@ export const Player = () => {
     <div className="player-container">
       <div
         className="player-main-container"
-        style={{ width: hourGap !== 0 ? "75%" : "25%" }}
+        style={{
+          width: hourGap !== 0 ? "75%" : "27%",
+          gap: hourGap !== 0 ? "15px" : "0px",
+        }}
       >
         <div className="buttons-container">
           <Button
