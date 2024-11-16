@@ -36,6 +36,10 @@ export const useHeatmapLayersState = create((set, get) => ({
   setColorDomain: (colorDomain) => set({ colorDomain }),
 
   setPalette: async () => {
+    if (!get().variable) {
+      console.error("Variable is not defined");
+      return;
+    }
     console.log("setPalette: entra");
     const { dateFrom, dateTo } = usePlayingState.getState();
     const { min, max, histogram } = await getPalette(
@@ -45,7 +49,8 @@ export const useHeatmapLayersState = create((set, get) => ({
       getVariables(get().variable)
     );
     get().setPaletteMinMax({ min, max });
-    console.log("setPalette, setPaletteMinMax", min, max);
+    console.log("setPaletteMinMax", min, max);
+    console.log("histogram: ", histogram);
 
     get().setPaletteHistogram(histogram);
     get().setPaletteDistribution(histogram.map((d) => d.value));
@@ -55,14 +60,15 @@ export const useHeatmapLayersState = create((set, get) => ({
       HISTOGRAM_THRESHOLD,
       MIN_THRESHOLDS[get().variable.toUpperCase()]
     );
+    console.log("colorDomain: ", colorDomain);
     get().setColorDomain(colorDomain);
-    console.log("setPalette: termina");
   },
 
   getLayersForTime: async (date) => {
     console.log("getLayersForTime: entra");
 
     const mapState = useMapState.getState();
+
     let reduceOpacity = useParticlesLayersState.getState().domains.length;
     const newLayers = [];
     for (let domain of get().domains) {
@@ -121,6 +127,8 @@ export const useHeatmapLayersState = create((set, get) => ({
   },
 
   addDomains: (newDomains) => {
+    const mapState = useMapState.getState();
+    mapState.removeAllLayers("heatmap"); // WORKAROUND
     get().setDomains([...get().domains, ...newDomains]);
     // Si la reproducción ya empezó pero está en paused, cargamos el layer actual desde aquí
     if (usePlayingState.getState().paused && get().domains.length) {
@@ -129,16 +137,18 @@ export const useHeatmapLayersState = create((set, get) => ({
   },
 
   removeDomains: (optionId) => {
+    const mapState = useMapState.getState();
     let newDomains = get().domains.filter((d) => d.option.id != optionId);
     if (newDomains.length != get().domains.length) {
+      mapState.removeAllLayers("heatmap"); // WORKAROUND
       get().setDomains(newDomains);
-      const mapState = useMapState.getState();
-      mapState.removeLayers(optionId);
+
+      // mapState.removeLayers(optionId);
       if (usePlayingState.getState().paused && get().domains.length) {
         get().refreshLayers();
       }
     }
-    if (newDomains == 0) {
+    if (newDomains.length == 0) {
       get().setVariable(null);
     }
   },

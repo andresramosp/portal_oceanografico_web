@@ -3,7 +3,7 @@ import { Space } from "antd";
 import PaletteService from "../services/palette.service";
 import { useHeatmapLayersState } from "../states/HeatmapLayersState";
 import { componentTheme } from "../themes/blueTheme";
-import { variableIcons } from "../resources/menuIcons";
+import { otherIcons, variableIcons } from "../resources/menuIcons";
 
 const { Player: playerTheme } = componentTheme.components;
 
@@ -21,7 +21,7 @@ export const PlayerLegend = () => {
     colorLegendComp.domain = [paletteMinMax.min, paletteMinMax.max];
   }, [paletteDistribution]);
 
-  const IconComponent = variableIcons[variable];
+  const IconComponent = variableIcons[variable] || otherIcons.default;
 
   return (
     <div className="player-legend-container">

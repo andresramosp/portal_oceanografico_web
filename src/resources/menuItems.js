@@ -31,6 +31,20 @@ export default [
         ],
       },
       {
+        id: "pde-temp-ALM",
+        optionName: "Temperatura PdE ALM",
+        optionType: "actionable",
+        variable: "temperature",
+        mapResources: [
+          {
+            id: "pde-temp-gibreg",
+            sourceId: "pde",
+            resourceType: "heatmap",
+            url: "/ALM-CST",
+          },
+        ],
+      },
+      {
         id: "cop-tiles-temp",
         optionName: "Temp. Tiles Cop.",
         optionType: "actionable",
@@ -169,14 +183,14 @@ export default [
           },
           {
             id: "boyas-moviles",
-            optionName: "Boyas Lagragnianas",
+            optionName: "Boyas Lagrangianas",
             optionType: "actionable",
             icon: "boya_lagrangniana",
             mapResources: [
               {
                 sourceId: "southtek",
                 resourceType: "sensor",
-                url: "/boyas-lagragnianas",
+                url: "/boyas-Lagrangianas",
               },
             ],
           },
