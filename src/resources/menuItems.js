@@ -239,14 +239,6 @@ export default [
         optionType: "dropdown",
         options: [
           {
-            id: "IGEO-inner",
-            optionName: "Zona Interior",
-            optionType: "actionable",
-            variable: "geological",
-            sourceId: "IGEO",
-            resourceType: "feature",
-          },
-          {
             id: "IGEO-coast-units",
             optionName: "Costa - Unidades",
             optionType: "actionable",

@@ -67,6 +67,7 @@ export const Player = () => {
 
   const handleDateChange = (dates) => {
     setRange(dates[0].$d, dates[1].$d);
+    setPalette();
   };
 
   const getLayersForTime = (timeIndex) => {

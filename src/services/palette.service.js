@@ -258,28 +258,49 @@ const PaletteService = {
     );
   },
 
-  getColorsDistribution(paletteId, distribution, convertoToRGB) {
+  getColorsDistribution(
+    paletteId,
+    distribution,
+    convertoToRGB,
+    targetLength = 2000
+  ) {
     let palette = this.getColorsArray(paletteId, 0.01);
-    let result = new Array();
+    let result = [];
     let segmentSize = Math.ceil(palette.length / distribution.length);
     let paletteSize = palette.length;
+
+    // Bucle original que genera el resultado sin modificar la longitud de result
     for (let percent of distribution) {
       let numberColors = Math.floor((percent / 100) * paletteSize);
       if (numberColors < 2) {
-        // console.log("COLORS < 2");
         continue;
       }
+
       let colors = palette.splice(0, numberColors);
-      var rainbow = new Rainbow();
+      let rainbow = new Rainbow();
       rainbow.setNumberRange(1, segmentSize);
       rainbow.setSpectrum(...colors);
+
       let segment = [];
       for (let position = 1; position <= segmentSize; position++) {
-        var color = rainbow.colourAt(position);
+        let color = rainbow.colourAt(position);
         segment.push(convertoToRGB ? this.hexToRgb(color) : "#" + color);
       }
       result = result.concat(segment);
     }
+
+    // Solo ajustar la longitud de result si targetLength tiene un valor válido
+    if (targetLength != null && targetLength > 0) {
+      if (result.length > targetLength) {
+        result = result.slice(0, targetLength);
+      } else {
+        while (result.length < targetLength) {
+          result.push(result[result.length - 1]); // Duplica el último color si faltan elementos
+        }
+      }
+    }
+
+    console.log(result.length);
     return result;
   },
 

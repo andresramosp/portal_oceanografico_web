@@ -128,7 +128,6 @@ export const useHeatmapLayersState = create((set, get) => ({
 
   addDomains: (newDomains) => {
     const mapState = useMapState.getState();
-    mapState.removeAllLayers("heatmap"); // WORKAROUND
     get().setDomains([...get().domains, ...newDomains]);
     // Si la reproducción ya empezó pero está en paused, cargamos el layer actual desde aquí
     if (usePlayingState.getState().paused && get().domains.length) {
@@ -140,10 +139,8 @@ export const useHeatmapLayersState = create((set, get) => ({
     const mapState = useMapState.getState();
     let newDomains = get().domains.filter((d) => d.option.id != optionId);
     if (newDomains.length != get().domains.length) {
-      mapState.removeAllLayers("heatmap"); // WORKAROUND
       get().setDomains(newDomains);
-
-      // mapState.removeLayers(optionId);
+      mapState.removeLayers(optionId);
       if (usePlayingState.getState().paused && get().domains.length) {
         get().refreshLayers();
       }

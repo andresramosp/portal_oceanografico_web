@@ -113,7 +113,7 @@ export const usePlayingState = create((set, get) => ({
   setRange: (from, to) => {
     set({ dateFrom: from ? dayjs(from) : null });
     set({ dateTo: to ? dayjs(to) : null });
-    set({ timeIndex: -1 });
+    set({ timeIndex: 0 });
     get().getTimeIntervalArray();
   },
 
